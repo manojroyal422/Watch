@@ -1,0 +1,3166 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AURELION — Time Is An Art Form | Haute Horlogerie</title>
+  <meta name="description" content="AURELION Swiss-inspired haute horlogerie digital flagship. Engineered beyond precision. Designed beyond time." />
+
+  <!-- Google Fonts: Cormorant Garamond & Manrope / Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Inter:wght@300;400;500&family=Manrope:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            obsidian: '#080909',
+            charcoal: '#141515',
+            champagne: '#C5A46D',
+            titanium: '#B8B9B6',
+            ivory: '#EAE5DB',
+            graphite: '#343638',
+          },
+          fontFamily: {
+            serif: ['"Cormorant Garamond"', 'Georgia', 'serif'],
+            sans: ['"Manrope"', '"Inter"', 'sans-serif'],
+          },
+          letterSpacing: {
+            'ultra': '0.28em',
+            'editorial': '0.18em',
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Three.js r128 + OrbitControls -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+  <style>
+    :root {
+      --obsidian: #080909;
+      --charcoal: #141515;
+      --champagne: #C5A46D;
+      --titanium: #B8B9B6;
+      --ivory: #EAE5DB;
+      --graphite: #343638;
+    }
+
+    * {
+      box-sizing: border-box;
+      scrollbar-width: thin;
+      scrollbar-color: #343638 #080909;
+    }
+
+    body {
+      background-color: #080909;
+      color: #EAE5DB;
+      font-family: 'Manrope', 'Inter', sans-serif;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Subtle architectural grid texture */
+    .bg-atelier-grid {
+      background-image:
+        linear-gradient(to right, rgba(197, 164, 109, 0.04) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(197, 164, 109, 0.04) 1px, transparent 1px);
+      background-size: 64px 64px;
+    }
+
+    .hairline-border {
+      border: 1px solid rgba(197, 164, 109, 0.22);
+    }
+
+    .hairline-subtle {
+      border: 1px solid rgba(234, 229, 219, 0.08);
+    }
+
+    /* Custom luxury range slider */
+    input[type="range"].luxury-slider {
+      -webkit-appearance: none;
+      appearance: none;
+      background: rgba(234, 229, 219, 0.14);
+      height: 1px;
+      outline: none;
+    }
+    input[type="range"].luxury-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 14px;
+      height: 14px;
+      background: #C5A46D;
+      border: 2px solid #080909;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    input[type="range"].luxury-slider::-webkit-slider-thumb:hover {
+      transform: scale(1.25);
+      box-shadow: 0 0 12px rgba(197, 164, 109, 0.6);
+    }
+
+    /* Preloader animations */
+    @keyframes spinSlow {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    @keyframes pulseSubtle {
+      0%, 100% { opacity: 0.45; }
+      50% { opacity: 1; }
+    }
+    .animate-spin-slow {
+      animation: spinSlow 18s linear infinite;
+    }
+    .animate-pulse-subtle {
+      animation: pulseSubtle 2.4s ease-in-out infinite;
+    }
+
+    /* Canvas containers */
+    .webgl-container canvas {
+      display: block;
+      width: 100% !important;
+      height: 100% !important;
+      outline: none;
+      touch-action: pan-y;
+    }
+
+    /* Editorial reveal */
+    .reveal-section {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1), transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .reveal-section.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Custom button hover sweep */
+    .btn-luxury {
+      position: relative;
+      overflow: hidden;
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .btn-luxury::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(197, 164, 109, 0.12);
+      transform: translateX(-101%);
+      transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .btn-luxury:hover::after {
+      transform: translateX(0);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .animate-spin-slow, .animate-pulse-subtle { animation: none; }
+      .reveal-section { opacity: 1; transform: none; transition: none; }
+    }
+  </style>
+</head>
+<body class="bg-obsidian text-ivory selection:bg-champagne selection:text-obsidian">
+
+  <!-- =====================================================================
+       01. CINEMATIC PRELOADER
+  ====================================================================== -->
+  <div id="preloader" class="fixed inset-0 z-[100] bg-obsidian flex flex-col items-center justify-center transition-opacity duration-1000">
+    <div class="relative w-28 h-28 flex items-center justify-center mb-8">
+      <!-- Rotating Escapement Ring SVG -->
+      <svg class="w-full h-full animate-spin-slow text-champagne/40" viewBox="0 0 120 120" fill="none">
+        <circle cx="60" cy="60" r="56" stroke="currentColor" stroke-width="0.6" stroke-dasharray="3 3" />
+        <circle cx="60" cy="60" r="46" stroke="currentColor" stroke-width="0.8" />
+        <line x1="60" y1="2" x2="60" y2="12" stroke="#C5A46D" stroke-width="1" />
+        <line x1="60" y1="108" x2="60" y2="118" stroke="#C5A46D" stroke-width="1" />
+        <line x1="2" y1="60" x2="12" y2="60" stroke="#C5A46D" stroke-width="1" />
+        <line x1="108" y1="60" x2="118" y2="60" stroke="#C5A46D" stroke-width="1" />
+      </svg>
+      <!-- AURELION Monogram -->
+      <svg class="w-11 h-11 absolute text-champagne" viewBox="0 0 48 48" fill="none">
+        <polygon points="24,4 42,40 35,40 24,17 13,40 6,40" stroke="currentColor" stroke-width="1.4" />
+        <line x1="15" y1="30" x2="33" y2="30" stroke="currentColor" stroke-width="1.2" />
+        <circle cx="24" cy="24" r="2.2" fill="currentColor" />
+      </svg>
+    </div>
+
+    <div class="text-center space-y-2">
+      <div class="font-serif text-3xl md:text-4xl tracking-ultra text-ivory font-light">AURELION</div>
+      <div class="text-[10px] tracking-ultra text-champagne uppercase">The Art of Precision</div>
+    </div>
+
+    <div class="w-56 h-[1px] bg-graphite/60 mt-8 overflow-hidden relative">
+      <div id="preloader-bar" class="h-full bg-champagne w-0 transition-all duration-300"></div>
+    </div>
+    <div id="preloader-percent" class="mt-3 text-[10px] tracking-editorial text-titanium/70 font-mono">CALIBRATING 28,800 VPH — 0%</div>
+  </div>
+
+  <!-- =====================================================================
+       TOAST NOTIFICATION BANNER
+  ====================================================================== -->
+  <div id="toast-container" class="fixed bottom-6 right-6 z-[90] flex flex-col gap-3 pointer-events-none"></div>
+
+  <!-- =====================================================================
+       02. FLOATING LUXURY NAVIGATION
+  ====================================================================== -->
+  <header id="navbar" class="fixed top-0 inset-x-0 z-50 transition-all duration-500 border-b border-transparent">
+    <div class="max-w-[1440px] mx-auto px-5 md:px-10 h-20 flex items-center justify-between">
+      <!-- Left: Brand Emblem & Wordmark -->
+      <a href="#hero" class="flex items-center gap-3.5 group">
+        <svg class="w-7 h-7 text-champagne transition-transform duration-500 group-hover:rotate-180" viewBox="0 0 48 48" fill="none">
+          <circle cx="24" cy="24" r="21" stroke="currentColor" stroke-width="1" stroke-opacity="0.45" />
+          <polygon points="24,7 39,37 33,37 24,18 15,37 9,37" stroke="currentColor" stroke-width="1.4" />
+          <line x1="16" y1="29" x2="32" y2="29" stroke="currentColor" stroke-width="1.2" />
+        </svg>
+        <div class="flex flex-col">
+          <span class="font-serif text-xl md:text-2xl tracking-ultra text-ivory leading-none">AURELION</span>
+          <span class="text-[8px] tracking-ultra text-champagne/80 uppercase mt-1 hidden sm:block">Genève • Haute Horlogerie</span>
+        </div>
+      </a>
+
+      <!-- Center: Editorial Navigation Links -->
+      <nav class="hidden xl:flex items-center gap-7 text-[11px] tracking-editorial uppercase text-titanium">
+        <a href="#collections" class="hover:text-champagne transition-colors py-2">Collections</a>
+        <a href="#movement-lab" class="hover:text-champagne transition-colors py-2">The Movement</a>
+        <a href="#bespoke" class="hover:text-champagne transition-colors py-2">Bespoke Studio</a>
+        <a href="#comparison" class="hover:text-champagne transition-colors py-2">Comparison</a>
+        <a href="#craft-specs" class="hover:text-champagne transition-colors py-2">Craft &amp; Specs</a>
+        <a href="#journal" class="hover:text-champagne transition-colors py-2">Journal</a>
+        <a href="#concierge" class="hover:text-champagne transition-colors py-2">Concierge</a>
+      </nav>
+
+      <!-- Right: Utility Icons (Search, Wishlist, Bag, Menu) -->
+      <div class="flex items-center gap-2 sm:gap-4">
+        <button onclick="openSearchModal()" aria-label="Search Catalogue" class="p-2.5 text-ivory/80 hover:text-champagne transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+            <circle cx="11" cy="11" r="7" />
+            <line x1="20" y1="20" x2="16.2" y2="16.2" />
+          </svg>
+        </button>
+
+        <button onclick="openDrawer('wishlist')" aria-label="Wishlist" class="relative p-2.5 text-ivory/80 hover:text-champagne transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+            <path d="M12 20.5l-1.45-1.32C5.4 14.5 2 11.42 2 7.65 2 4.58 4.42 2.2 7.5 2.2c1.74 0 3.41.81 4.5 2.09C13.09 3.01 14.76 2.2 16.5 2.2 19.58 2.2 22 4.58 22 7.65c0 3.77-3.4 6.85-8.55 11.54L12 20.5z" />
+          </svg>
+          <span id="wishlist-badge" class="hidden absolute top-1 right-1 w-4 h-4 rounded-full bg-champagne text-obsidian text-[9px] font-semibold flex items-center justify-center">0</span>
+        </button>
+
+        <button onclick="openDrawer('bag')" aria-label="Shopping Bag" class="relative p-2.5 text-ivory/80 hover:text-champagne transition-colors flex items-center gap-2">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+            <path d="M6 7h12l1 13H5L6 7z" />
+            <path d="M9 7V5a3 3 0 016 0v2" />
+          </svg>
+          <span class="hidden md:inline text-[10px] tracking-editorial uppercase">Bag</span>
+          <span id="bag-badge" class="w-4 h-4 rounded-full bg-champagne/90 text-obsidian text-[9px] font-semibold flex items-center justify-center">0</span>
+        </button>
+
+        <button onclick="toggleFullscreenMenu()" aria-label="Open Atelier Menu" class="p-2.5 text-ivory hover:text-champagne transition-colors flex items-center gap-2 border-l border-ivory/10 pl-4">
+          <span class="hidden sm:inline text-[10px] tracking-editorial uppercase">Menu</span>
+          <div class="w-5 flex flex-col gap-1.5">
+            <span class="w-full h-[1px] bg-current"></span>
+            <span class="w-3.5 h-[1px] bg-champagne self-end"></span>
+          </div>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Fullscreen Architectural Menu Overlay -->
+  <div id="fullscreen-menu" class="fixed inset-0 z-[70] bg-obsidian/98 backdrop-blur-xl hidden opacity-0 transition-opacity duration-500 overflow-y-auto">
+    <div class="max-w-[1440px] mx-auto px-6 md:px-12 py-8 min-h-screen flex flex-col justify-between">
+      <div class="flex items-center justify-between border-b border-ivory/10 pb-6">
+        <span class="font-serif text-2xl tracking-ultra text-ivory">AURELION</span>
+        <button onclick="toggleFullscreenMenu()" class="flex items-center gap-3 text-xs tracking-editorial uppercase text-titanium hover:text-champagne transition-colors py-2 px-3">
+          <span>Close</span>
+          <span class="text-lg leading-none">&times;</span>
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 my-12">
+        <div class="lg:col-span-7 flex flex-col gap-5">
+          <p class="text-[10px] tracking-ultra text-champagne uppercase mb-2">Navigation Index</p>
+          <a href="#hero" onclick="toggleFullscreenMenu()" class="font-serif text-4xl md:text-6xl font-light text-ivory hover:text-champagne hover:translate-x-3 transition-all">01. Flagship Hero</a>
+          <a href="#viewer-studio" onclick="toggleFullscreenMenu()" class="font-serif text-4xl md:text-6xl font-light text-ivory hover:text-champagne hover:translate-x-3 transition-all">02. 360° Atelier Viewer</a>
+          <a href="#movement-lab" onclick="toggleFullscreenMenu()" class="font-serif text-4xl md:text-6xl font-light text-ivory hover:text-champagne hover:translate-x-3 transition-all">03. Exploded Caliber AU-01</a>
+          <a href="#collections" onclick="toggleFullscreenMenu()" class="font-serif text-4xl md:text-6xl font-light text-ivory hover:text-champagne hover:translate-x-3 transition-all">04. Haute Horlogerie Collections</a>
+          <a href="#bespoke" onclick="toggleFullscreenMenu()" class="font-serif text-4xl md:text-6xl font-light text-ivory hover:text-champagne hover:translate-x-3 transition-all">05. Bespoke Watch Configurator</a>
+          <a href="#comparison" onclick="toggleFullscreenMenu()" class="font-serif text-4xl md:text-6xl font-light text-ivory hover:text-champagne hover:translate-x-3 transition-all">06. Dual Comparison Studio</a>
+          <a href="#craft-specs" onclick="toggleFullscreenMenu()" class="font-serif text-4xl md:text-6xl font-light text-ivory hover:text-champagne hover:translate-x-3 transition-all">07. Craft &amp; Technical Architecture</a>
+          <a href="#journal" onclick="toggleFullscreenMenu()" class="font-serif text-4xl md:text-6xl font-light text-ivory hover:text-champagne hover:translate-x-3 transition-all">08. Editorial Journal</a>
+          <a href="#concierge" onclick="toggleFullscreenMenu()" class="font-serif text-4xl md:text-6xl font-light text-ivory hover:text-champagne hover:translate-x-3 transition-all">09. Private Client Concierge</a>
+        </div>
+
+        <div class="lg:col-span-5 flex flex-col justify-between border-t lg:border-t-0 lg:border-l border-ivory/10 pt-8 lg:pt-0 lg:pl-12">
+          <div class="space-y-6">
+            <p class="text-[10px] tracking-ultra text-champagne uppercase">Maison Philosophy</p>
+            <p class="font-serif text-2xl text-ivory/90 leading-relaxed italic">
+              "Time is not merely measured; it is sculpted in Grade 5 titanium, 18k champagne gold, and hand-beveled sapphire."
+            </p>
+            <div class="grid grid-cols-2 gap-6 pt-6 border-t border-ivory/10 text-xs text-titanium">
+              <div>
+                <p class="text-champagne uppercase tracking-widest text-[10px] mb-1">Geneva Manufacture</p>
+                <p>Rue du Rhône 42, Genève</p>
+              </div>
+              <div>
+                <p class="text-champagne uppercase tracking-widest text-[10px] mb-1">India Flagship Salon</p>
+                <p>UB City, Vittal Mallya Rd, Bengaluru</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-10 p-6 bg-charcoal/80 hairline-border">
+            <p class="text-[10px] tracking-ultra text-champagne uppercase mb-2">Private Appointment</p>
+            <p class="text-xs text-titanium mb-4">Request a one-on-one horological presentation with a Senior Master Specialist.</p>
+            <a href="#concierge" onclick="toggleFullscreenMenu()" class="inline-block text-[11px] tracking-editorial uppercase text-ivory border-b border-champagne pb-1 hover:text-champagne transition-colors">
+              Reserve Private Viewing &rarr;
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       03. FULL-SCREEN CINEMATIC 3D HERO (100vh)
+  ====================================================================== -->
+  <section id="hero" class="relative min-h-screen w-full flex flex-col justify-between overflow-hidden bg-obsidian pt-20">
+    <!-- Ambient Radial Spotlight -->
+    <div class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_46%,rgba(197,164,109,0.14)_0%,rgba(20,21,21,0.4)_45%,rgba(8,9,9,0.98)_82%)]"></div>
+
+    <!-- Top Architectural Telemetry Bar -->
+    <div class="relative z-10 max-w-[1440px] w-full mx-auto px-5 md:px-10 pt-4 flex items-center justify-between text-[10px] tracking-ultra text-titanium/70 uppercase">
+      <span class="flex items-center gap-2">
+        <span class="w-1.5 h-1.5 rounded-full bg-champagne animate-pulse"></span>
+        Caliber AU-01 Openworked Tourbillon
+      </span>
+      <span class="hidden md:inline">Drag 360° to Inspect Timepiece</span>
+      <span>Swiss Manufacture • 28,800 VPH</span>
+    </div>
+
+    <!-- Center Interactive 3D Hero Stage -->
+    <div class="relative flex-1 w-full flex items-center justify-center min-h-[540px] md:min-h-[620px]">
+      <div id="hero-canvas-container" class="webgl-container absolute inset-0 w-full h-full cursor-grab active:cursor-grabbing"></div>
+
+      <!-- Subtle Editorial Overlay Typography -->
+      <div class="relative z-10 pointer-events-none max-w-[1440px] w-full mx-auto px-5 md:px-10 flex flex-col lg:flex-row items-center lg:items-end justify-between h-full py-8 md:py-12 gap-8">
+        <div class="text-center lg:text-left max-w-xl bg-obsidian/45 lg:bg-transparent backdrop-blur-[2px] lg:backdrop-blur-none p-4 lg:p-0">
+          <p class="text-[10px] md:text-xs tracking-ultra text-champagne uppercase mb-3">Aurelion Flagship Collection</p>
+          <h1 class="font-serif text-4xl sm:text-6xl xl:text-7xl font-light tracking-wide text-ivory leading-[1.05]">
+            TIME IS AN <span class="italic text-champagne">ART FORM.</span>
+          </h1>
+          <p class="mt-4 text-xs sm:text-sm text-titanium leading-relaxed max-w-md mx-auto lg:mx-0 font-light">
+            Beyond precision. Beyond expectation. A new expression of mechanical excellence sculpted in 18k champagne gold and Grade 5 titanium.
+          </p>
+        </div>
+
+        <!-- Primary & Secondary Hero CTAs -->
+        <div class="pointer-events-auto flex flex-col sm:flex-row items-center gap-4">
+          <a href="#collections" class="btn-luxury px-7 py-4 bg-champagne text-obsidian text-[11px] font-semibold tracking-editorial uppercase hover:bg-ivory transition-colors text-center min-w-[220px]">
+            Explore The Collection
+          </a>
+          <a href="#movement-lab" onclick="triggerExplodeFromHero()" class="btn-luxury px-7 py-4 bg-obsidian/80 backdrop-blur-md hairline-border text-ivory text-[11px] tracking-editorial uppercase hover:border-champagne hover:text-champagne transition-colors text-center min-w-[220px]">
+            Discover The Movement
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Scroll Cue & Specs Strip -->
+    <div class="relative z-10 border-t border-ivory/10 bg-obsidian/80 backdrop-blur-md">
+      <div class="max-w-[1440px] mx-auto px-5 md:px-10 py-3.5 flex flex-wrap items-center justify-between gap-4 text-[10px] tracking-editorial text-titanium uppercase">
+        <div class="flex items-center gap-6">
+          <span>Power Reserve: <strong class="text-ivory font-medium">72 Hours</strong></span>
+          <span class="hidden sm:inline">Case: <strong class="text-ivory font-medium">41.0 mm</strong></span>
+          <span class="hidden md:inline">Water Resistance: <strong class="text-ivory font-medium">100M / 10 ATM</strong></span>
+        </div>
+        <a href="#viewer-studio" class="flex items-center gap-2 text-champagne hover:text-ivory transition-colors">
+          <span>Enter Atelier 3D Studio</span>
+          <span>&darr;</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- =====================================================================
+       04 & 05. INTERACTIVE 3D ATELIER VIEWER & 15-COMPONENT EXPLODED VIEW
+  ====================================================================== -->
+  <section id="viewer-studio" class="relative py-24 md:py-32 bg-charcoal border-t border-ivory/10 bg-atelier-grid">
+    <div id="movement-lab" class="max-w-[1440px] mx-auto px-5 md:px-10">
+      <!-- Section Header -->
+      <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-8 mb-12 reveal-section">
+        <div>
+          <p class="text-[10px] tracking-ultra text-champagne uppercase mb-3">Interactive Horological Architecture</p>
+          <h2 class="font-serif text-4xl sm:text-5xl md:text-6xl font-light text-ivory leading-tight">
+            BEAUTY IN EVERY <span class="italic text-champagne">COMPONENT.</span>
+          </h2>
+          <p class="mt-3 text-sm text-titanium max-w-2xl font-light">
+            Discover the engineering hidden beneath every second. Orbit 360°, switch studio lighting environments, customize case alloys, or separate Caliber AU-01 into 15 individually inspectable mechanical assemblies.
+          </p>
+        </div>
+
+        <!-- Master Explode / Assemble Action Bar -->
+        <div class="flex flex-wrap items-center gap-3">
+          <button id="btn-explode" onclick="setExplosionTarget(1)" class="px-5 py-3 bg-champagne text-obsidian text-[11px] font-semibold tracking-editorial uppercase hover:bg-ivory transition-colors">
+            Explode Watch
+          </button>
+          <button id="btn-assemble" onclick="setExplosionTarget(0)" class="px-5 py-3 bg-obsidian hairline-border text-ivory text-[11px] tracking-editorial uppercase hover:border-champagne hover:text-champagne transition-colors">
+            Assemble Watch
+          </button>
+          <button onclick="resetMainCamera()" class="px-4 py-3 bg-obsidian/70 hairline-subtle text-titanium text-[11px] tracking-editorial uppercase hover:text-ivory transition-colors">
+            Reset View
+          </button>
+        </div>
+      </div>
+
+      <!-- Main Studio Workspace Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+
+        <!-- Left Column: Camera Presets, Lighting Studio & Material Quick-Switch -->
+        <div class="lg:col-span-3 flex flex-col justify-between bg-obsidian/90 hairline-subtle p-6 space-y-7">
+          <!-- Camera Angles -->
+          <div>
+            <p class="text-[10px] tracking-ultra text-champagne uppercase mb-3">01. Camera Angles</p>
+            <div class="grid grid-cols-2 lg:grid-cols-1 gap-2">
+              <button onclick="setCameraPreset('front')" class="cam-preset-btn text-left px-3.5 py-2.5 text-[11px] tracking-editorial uppercase bg-charcoal border border-champagne/40 text-ivory hover:border-champagne transition-colors" data-preset="front">Front View</button>
+              <button onclick="setCameraPreset('side')" class="cam-preset-btn text-left px-3.5 py-2.5 text-[11px] tracking-editorial uppercase bg-charcoal/50 border border-ivory/10 text-titanium hover:text-ivory hover:border-champagne/40 transition-colors" data-preset="side">Side Profile</button>
+              <button onclick="setCameraPreset('back')" class="cam-preset-btn text-left px-3.5 py-2.5 text-[11px] tracking-editorial uppercase bg-charcoal/50 border border-ivory/10 text-titanium hover:text-ivory hover:border-champagne/40 transition-colors" data-preset="back">Exhibition Back</button>
+              <button onclick="setCameraPreset('movement')" class="cam-preset-btn text-left px-3.5 py-2.5 text-[11px] tracking-editorial uppercase bg-charcoal/50 border border-ivory/10 text-titanium hover:text-ivory hover:border-champagne/40 transition-colors" data-preset="movement">Movement Macro</button>
+              <button id="btn-autorotate" onclick="toggleAutoRotate()" class="col-span-2 lg:col-span-1 text-left px-3.5 py-2.5 text-[11px] tracking-editorial uppercase bg-charcoal/50 border border-ivory/10 text-titanium hover:text-champagne transition-colors flex items-center justify-between">
+                <span>Full 360° Rotation</span>
+                <span id="autorotate-indicator" class="text-[9px] text-champagne">ON</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Studio Lighting Environment -->
+          <div>
+            <p class="text-[10px] tracking-ultra text-champagne uppercase mb-3">02. Studio Lighting</p>
+            <div class="grid grid-cols-3 gap-2">
+              <button onclick="setStudioLighting('gold')" class="light-btn px-2 py-2.5 text-[10px] tracking-wider uppercase bg-charcoal border border-champagne text-ivory" data-light="gold">Warm Atelier</button>
+              <button onclick="setStudioLighting('noir')" class="light-btn px-2 py-2.5 text-[10px] tracking-wider uppercase bg-charcoal/40 border border-ivory/10 text-titanium" data-light="noir">Noir</button>
+              <button onclick="setStudioLighting('titanium')" class="light-btn px-2 py-2.5 text-[10px] tracking-wider uppercase bg-charcoal/40 border border-ivory/10 text-titanium" data-light="titanium">Cool Lab</button>
+            </div>
+          </div>
+
+          <!-- Quick Alloy, Dial & Strap Switcher -->
+          <div class="space-y-4 pt-2 border-t border-ivory/10">
+            <p class="text-[10px] tracking-ultra text-champagne uppercase">03. Live Material Preview</p>
+
+            <div>
+              <span class="block text-[10px] text-titanium uppercase tracking-wider mb-2">Case Alloy</span>
+              <div class="flex gap-2.5">
+                <button onclick="applyWatchMaterial('gold')" title="18k Champagne Gold" class="w-7 h-7 rounded-full border border-ivory/40 bg-[#C5A46D] hover:scale-110 transition-transform"></button>
+                <button onclick="applyWatchMaterial('titanium')" title="Grade 5 Titanium" class="w-7 h-7 rounded-full border border-ivory/40 bg-[#B8B9B6] hover:scale-110 transition-transform"></button>
+                <button onclick="applyWatchMaterial('platinum')" title="950 Platinum" class="w-7 h-7 rounded-full border border-ivory/40 bg-[#E5E7EB] hover:scale-110 transition-transform"></button>
+                <button onclick="applyWatchMaterial('ceramic')" title="Obsidian Ceramic" class="w-7 h-7 rounded-full border border-ivory/40 bg-[#1B1D1F] hover:scale-110 transition-transform"></button>
+              </div>
+            </div>
+
+            <div>
+              <span class="block text-[10px] text-titanium uppercase tracking-wider mb-2">Dial Architecture</span>
+              <div class="grid grid-cols-2 gap-1.5 text-[10px]">
+                <button onclick="applyWatchDial('skeleton')" class="px-2.5 py-1.5 bg-charcoal border border-ivory/15 text-ivory hover:border-champagne transition-colors uppercase tracking-wider">Skeleton</button>
+                <button onclick="applyWatchDial('obsidian')" class="px-2.5 py-1.5 bg-charcoal border border-ivory/15 text-ivory hover:border-champagne transition-colors uppercase tracking-wider">Obsidian</button>
+                <button onclick="applyWatchDial('midnight')" class="px-2.5 py-1.5 bg-charcoal border border-ivory/15 text-ivory hover:border-champagne transition-colors uppercase tracking-wider">Midnight</button>
+                <button onclick="applyWatchDial('ivory')" class="px-2.5 py-1.5 bg-charcoal border border-ivory/15 text-ivory hover:border-champagne transition-colors uppercase tracking-wider">Ivory</button>
+              </div>
+            </div>
+
+            <div>
+              <span class="block text-[10px] text-titanium uppercase tracking-wider mb-2">Strap Style</span>
+              <div class="grid grid-cols-2 gap-1.5 text-[10px]">
+                <button onclick="applyWatchStrap('rubber')" class="px-2.5 py-1.5 bg-charcoal border border-ivory/15 text-ivory hover:border-champagne transition-colors uppercase tracking-wider">FKM Rubber</button>
+                <button onclick="applyWatchStrap('bracelet')" class="px-2.5 py-1.5 bg-charcoal border border-ivory/15 text-ivory hover:border-champagne transition-colors uppercase tracking-wider">Metal Link</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Center Column: Interactive 3D Viewport + Explosion Distance Slider -->
+        <div class="lg:col-span-6 relative bg-obsidian hairline-border flex flex-col justify-between min-h-[520px] md:min-h-[640px] overflow-hidden">
+          <!-- Top HUD -->
+          <div class="relative z-10 p-4 md:p-5 flex items-center justify-between pointer-events-none">
+            <div class="bg-obsidian/80 backdrop-blur-md px-3 py-1.5 hairline-subtle text-[10px] tracking-editorial uppercase text-titanium">
+              Click any 3D part to inspect
+            </div>
+            <div class="flex items-center gap-2 pointer-events-auto">
+              <button onclick="zoomMainCamera(-0.8)" aria-label="Zoom In" class="w-8 h-8 bg-obsidian/85 hairline-subtle text-ivory hover:border-champagne hover:text-champagne flex items-center justify-center text-sm">+</button>
+              <button onclick="zoomMainCamera(0.8)" aria-label="Zoom Out" class="w-8 h-8 bg-obsidian/85 hairline-subtle text-ivory hover:border-champagne hover:text-champagne flex items-center justify-center text-sm">&minus;</button>
+            </div>
+          </div>
+
+          <!-- 3D Canvas -->
+          <div id="studio-canvas-container" class="webgl-container absolute inset-0 w-full h-full cursor-grab active:cursor-grabbing"></div>
+
+          <!-- Floating Selected Component Tag -->
+          <div id="floating-part-badge" class="relative z-10 mx-auto my-auto pointer-events-none opacity-0 transition-opacity duration-300">
+            <div class="bg-obsidian/90 backdrop-blur-md px-4 py-2 hairline-border text-center">
+              <span id="floating-part-num" class="text-[9px] tracking-ultra text-champagne uppercase block">PART 01 / 15</span>
+              <span id="floating-part-name" class="font-serif text-lg text-ivory">Domed Sapphire Crystal</span>
+            </div>
+          </div>
+
+          <!-- Bottom Explosion Distance Control -->
+          <div class="relative z-10 p-4 md:p-6 bg-gradient-to-t from-obsidian via-obsidian/95 to-transparent border-t border-ivory/10">
+            <div class="flex items-center justify-between text-[10px] tracking-editorial uppercase mb-2.5">
+              <span class="text-titanium">Mechanical Separation Axis</span>
+              <span id="explosion-percent-label" class="text-champagne font-mono">0% ASSEMBLED</span>
+            </div>
+            <input id="explosion-slider" type="range" min="0" max="100" value="0" oninput="onExplosionSliderInput(this.value)" class="luxury-slider w-full" />
+            <div class="flex justify-between text-[9px] text-titanium/60 uppercase tracking-widest mt-2">
+              <span>Hermetic Seal</span>
+              <span>Caliber Layering</span>
+              <span>Full 15-Part Exploded</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column: 15 Component Index & Detailed Horological Inspector -->
+        <div class="lg:col-span-3 flex flex-col justify-between bg-obsidian/90 hairline-subtle p-6">
+          <!-- Selected Component Inspector Card -->
+          <div id="component-inspector" class="pb-5 border-b border-ivory/10">
+            <div class="flex items-center justify-between mb-2">
+              <span id="inspector-index" class="text-[10px] tracking-ultra text-champagne uppercase">Component 07 / 15</span>
+              <span class="text-[9px] tracking-widest uppercase px-2 py-0.5 bg-charcoal text-titanium border border-ivory/10">Caliber AU-01</span>
+            </div>
+            <h3 id="inspector-title" class="font-serif text-2xl text-ivory font-normal">Free-Sprung Balance Wheel</h3>
+            <p id="inspector-material" class="text-[11px] text-champagne mt-1 tracking-wide">Material: Glucydur Beryllium-Bronze &amp; Silicon Hairspring</p>
+            <p id="inspector-purpose" class="text-xs text-titanium/90 mt-3 leading-relaxed">
+              Oscillates at exactly 4 Hz (28,800 vibrations per hour), dividing time into eight equal increments per second with variable-inertia gold timing weights.
+            </p>
+            <div class="mt-3 pt-3 border-t border-ivory/10 text-[10px] text-titanium/70 flex justify-between">
+              <span>Finishing:</span>
+              <span id="inspector-finish" class="text-ivory">Diamond-Poised &amp; Mirror Beveled</span>
+            </div>
+          </div>
+
+          <!-- Scrollable List of All 15 Mechanical Components -->
+          <div class="mt-4 flex-1 flex flex-col min-h-0">
+            <p class="text-[10px] tracking-ultra text-titanium uppercase mb-2.5">15 Mechanical Assemblies</p>
+            <div id="component-list" class="overflow-y-auto max-h-[290px] pr-1 space-y-1 text-xs">
+              <!-- Populated dynamically via JS -->
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- =====================================================================
+       06. LUXURY WATCH COLLECTIONS & EDITORIAL GALLERY (8 TIMEPIECES)
+  ====================================================================== -->
+  <section id="collections" class="py-24 md:py-32 bg-obsidian border-t border-ivory/10">
+    <div class="max-w-[1440px] mx-auto px-5 md:px-10">
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-14 reveal-section">
+        <div>
+          <p class="text-[10px] tracking-ultra text-champagne uppercase mb-3">The Permanent &amp; Limited Lineages</p>
+          <h2 class="font-serif text-4xl sm:text-5xl md:text-6xl font-light text-ivory">
+            HAUTE HORLOGERIE <span class="italic text-champagne">COLLECTIONS.</span>
+          </h2>
+        </div>
+
+        <!-- Collection Filter Tabs -->
+        <div class="flex flex-wrap gap-2" id="collection-filters">
+          <button onclick="filterCollection('ALL')" class="col-filter-btn px-4 py-2.5 text-[10px] tracking-editorial uppercase bg-champagne text-obsidian font-semibold" data-col="ALL">All Timepieces (8)</button>
+          <button onclick="filterCollection('AURELION NOIR')" class="col-filter-btn px-4 py-2.5 text-[10px] tracking-editorial uppercase bg-charcoal border border-ivory/15 text-titanium hover:text-ivory" data-col="AURELION NOIR">Aurelion Noir</button>
+          <button onclick="filterCollection('AURELION ROYALE')" class="col-filter-btn px-4 py-2.5 text-[10px] tracking-editorial uppercase bg-charcoal border border-ivory/15 text-titanium hover:text-ivory" data-col="AURELION ROYALE">Aurelion Royale</button>
+          <button onclick="filterCollection('AURELION CHRONOS')" class="col-filter-btn px-4 py-2.5 text-[10px] tracking-editorial uppercase bg-charcoal border border-ivory/15 text-titanium hover:text-ivory" data-col="AURELION CHRONOS">Aurelion Chronos</button>
+          <button onclick="filterCollection('AURELION INFINITE')" class="col-filter-btn px-4 py-2.5 text-[10px] tracking-editorial uppercase bg-charcoal border border-ivory/15 text-titanium hover:text-ivory" data-col="AURELION INFINITE">Aurelion Infinite</button>
+        </div>
+      </div>
+
+      <!-- Collection Lineage Description Banner -->
+      <div id="collection-banner" class="mb-10 p-6 bg-charcoal/60 hairline-subtle flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <span id="collection-banner-title" class="text-xs tracking-ultra text-champagne uppercase">Complete Maison Catalogue</span>
+          <p id="collection-banner-desc" class="text-xs text-titanium mt-1">Eight individually numbered mechanical references crafted in limited annual allocations.</p>
+        </div>
+        <span class="text-[10px] tracking-editorial text-titanium/70 uppercase">5-Year International Manufacture Warranty</span>
+      </div>
+
+      <!-- Product Grid (8 Watches) -->
+      <div id="products-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+        <!-- Rendered dynamically by JS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- =====================================================================
+       08. BESPOKE WATCH CONFIGURATOR ("YOUR TIME. YOUR SIGNATURE.")
+  ====================================================================== -->
+  <section id="bespoke" class="py-24 md:py-32 bg-charcoal border-t border-ivory/10 bg-atelier-grid">
+    <div class="max-w-[1440px] mx-auto px-5 md:px-10">
+      <div class="max-w-3xl mb-14 reveal-section">
+        <p class="text-[10px] tracking-ultra text-champagne uppercase mb-3">Aurelion Sur-Mesure Atelier</p>
+        <h2 class="font-serif text-4xl sm:text-5xl md:text-6xl font-light text-ivory">
+          YOUR TIME. <span class="italic text-champagne">YOUR SIGNATURE.</span>
+        </h2>
+        <p class="mt-3 text-sm text-titanium font-light">
+          Commission a bespoke mechanical timepiece tailored to your aesthetic sensibility. Every selection updates the live 3D render and manufacture valuation in real time.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        <!-- Left: Live Interactive 3D Bespoke Preview -->
+        <div class="lg:col-span-7 bg-obsidian hairline-border relative min-h-[480px] md:min-h-[580px] flex flex-col justify-between overflow-hidden">
+          <div class="relative z-10 p-5 flex items-center justify-between pointer-events-none">
+            <div>
+              <span class="text-[9px] tracking-ultra text-champagne uppercase block">Bespoke Commission Reference</span>
+              <span id="bespoke-ref-code" class="font-mono text-xs text-ivory">AU-BESPOKE-TI-SK</span>
+            </div>
+            <span class="px-3 py-1 bg-charcoal/90 hairline-subtle text-[10px] tracking-editorial uppercase text-titanium">Live 3D Preview</span>
+          </div>
+
+          <div id="bespoke-canvas-container" class="webgl-container absolute inset-0 w-full h-full cursor-grab active:cursor-grabbing"></div>
+
+          <div class="relative z-10 p-5 bg-gradient-to-t from-obsidian via-obsidian/90 to-transparent border-t border-ivory/10 flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <span class="text-[10px] tracking-editorial text-titanium uppercase block">Estimated Bespoke Valuation</span>
+              <span id="bespoke-price" class="font-serif text-3xl text-champagne">₹11,40,000</span>
+            </div>
+            <div class="flex flex-wrap gap-2.5">
+              <button onclick="resetBespokeConfig()" class="px-4 py-2.5 bg-charcoal hairline-subtle text-[10px] tracking-editorial uppercase text-titanium hover:text-ivory transition-colors">Reset</button>
+              <button onclick="saveBespokeToWishlist()" class="px-4 py-2.5 bg-charcoal hairline-border text-[10px] tracking-editorial uppercase text-ivory hover:border-champagne hover:text-champagne transition-colors">Save Spec</button>
+              <button onclick="addBespokeToBag()" class="px-5 py-2.5 bg-champagne text-obsidian font-semibold text-[10px] tracking-editorial uppercase hover:bg-ivory transition-colors">Add to Bag</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Customization Controls -->
+        <div class="lg:col-span-5 bg-obsidian hairline-subtle p-6 md:p-8 space-y-6">
+          <!-- 1. Case Material -->
+          <div>
+            <div class="flex justify-between text-[10px] tracking-ultra uppercase mb-2.5">
+              <span class="text-champagne">01. Case Material</span>
+              <span id="label-case" class="text-ivory">Grade 5 Titanium</span>
+            </div>
+            <div class="grid grid-cols-2 gap-2" id="cfg-case-options"></div>
+          </div>
+
+          <!-- 2. Dial Architecture -->
+          <div>
+            <div class="flex justify-between text-[10px] tracking-ultra uppercase mb-2.5">
+              <span class="text-champagne">02. Dial Architecture</span>
+              <span id="label-dial" class="text-ivory">Full Openworked Skeleton</span>
+            </div>
+            <div class="grid grid-cols-2 gap-2" id="cfg-dial-options"></div>
+          </div>
+
+          <!-- 3. Strap / Bracelet -->
+          <div>
+            <div class="flex justify-between text-[10px] tracking-ultra uppercase mb-2.5">
+              <span class="text-champagne">03. Strap &amp; Clasp</span>
+              <span id="label-strap" class="text-ivory">FKM Vulcanized Rubber</span>
+            </div>
+            <div class="grid grid-cols-2 gap-2" id="cfg-strap-options"></div>
+          </div>
+
+          <!-- 4. Case Finishing -->
+          <div>
+            <div class="flex justify-between text-[10px] tracking-ultra uppercase mb-2.5">
+              <span class="text-champagne">04. Hand Finishing</span>
+              <span id="label-finish" class="text-ivory">Linear Brushed</span>
+            </div>
+            <div class="grid grid-cols-3 gap-2" id="cfg-finish-options"></div>
+          </div>
+
+          <!-- 5. Hands Alloy -->
+          <div>
+            <div class="flex justify-between text-[10px] tracking-ultra uppercase mb-2.5">
+              <span class="text-champagne">05. Dauphine Hands</span>
+              <span id="label-hands" class="text-ivory">18k Champagne Gold</span>
+            </div>
+            <div class="grid grid-cols-3 gap-2" id="cfg-hands-options"></div>
+          </div>
+
+          <!-- Summary Box -->
+          <div class="p-4 bg-charcoal/80 border border-ivory/10 text-xs text-titanium space-y-1.5">
+            <p class="text-[10px] tracking-editorial text-ivory uppercase mb-1">Specification Dossier</p>
+            <p id="bespoke-summary-text">Grade 5 Titanium case with Linear Brushed bevels, Full Openworked Skeleton dial, 18k Champagne Gold hands, paired with FKM Vulcanized Rubber strap.</p>
+            <p class="text-[10px] text-champagne pt-1">Delivery Lead Time: 6–8 Weeks from Geneva Manufacture</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =====================================================================
+       09 & 10. THE ART OF WATCHMAKING & TECHNICAL SPECIFICATION EXPLORER
+  ====================================================================== -->
+  <section id="craft-specs" class="py-24 md:py-32 bg-obsidian border-t border-ivory/10">
+    <div class="max-w-[1440px] mx-auto px-5 md:px-10">
+      <!-- Storytelling Intro -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center mb-20 reveal-section">
+        <div class="lg:col-span-6">
+          <p class="text-[10px] tracking-ultra text-champagne uppercase mb-3">Haute Horlogerie Philosophy</p>
+          <h2 class="font-serif text-4xl sm:text-5xl md:text-6xl font-light text-ivory leading-tight">
+            TIME DOES NOT WAIT. <span class="italic text-champagne">WE ENGINEER IT.</span>
+          </h2>
+          <p class="mt-5 text-sm text-titanium leading-relaxed font-light">
+            Every AURELION caliber undergoes over 420 hours of hand-finishing in our Geneva workshops. From anglage beveling on Grade 5 titanium bridges to box-domed synthetic sapphire crystals machined with diamond tools, every micron serves mechanical harmony.
+          </p>
+          <div class="grid grid-cols-3 gap-6 mt-8 pt-8 border-t border-ivory/10">
+            <div>
+              <div class="font-serif text-3xl md:text-4xl text-champagne">420+</div>
+              <div class="text-[10px] tracking-editorial uppercase text-titanium mt-1">Hours Hand-Finish</div>
+            </div>
+            <div>
+              <div class="font-serif text-3xl md:text-4xl text-ivory">0.002<span class="text-lg">mm</span></div>
+              <div class="text-[10px] tracking-editorial uppercase text-titanium mt-1">CNC Tolerance</div>
+            </div>
+            <div>
+              <div class="font-serif text-3xl md:text-4xl text-champagne">38</div>
+              <div class="text-[10px] tracking-editorial uppercase text-titanium mt-1">Synthetic Rubies</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Interactive Craftsmanship Pillars -->
+        <div class="lg:col-span-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="p-6 bg-charcoal hairline-subtle hover:border-champagne/40 transition-colors">
+            <span class="text-[10px] tracking-ultra text-champagne uppercase">01 / Anglage</span>
+            <h3 class="font-serif text-2xl text-ivory mt-2">Hand-Chamfered Bridges</h3>
+            <p class="text-xs text-titanium mt-2 leading-relaxed">32 interior acute angles beveled with boxwood sticks and diamond paste to catch ambient light across the movement.</p>
+          </div>
+          <div class="p-6 bg-charcoal hairline-subtle hover:border-champagne/40 transition-colors">
+            <span class="text-[10px] tracking-ultra text-champagne uppercase">02 / Corundum</span>
+            <h3 class="font-serif text-2xl text-ivory mt-2">Box-Domed Sapphire</h3>
+            <p class="text-xs text-titanium mt-2 leading-relaxed">9 Mohs hardness crystal with dual-sided anti-reflective vacuum coating for unobstructed architectural clarity.</p>
+          </div>
+          <div class="p-6 bg-charcoal hairline-subtle hover:border-champagne/40 transition-colors">
+            <span class="text-[10px] tracking-ultra text-champagne uppercase">03 / Isochronism</span>
+            <h3 class="font-serif text-2xl text-ivory mt-2">Silicon Balance Spring</h3>
+            <p class="text-xs text-titanium mt-2 leading-relaxed">Antimagnetic monocrystalline silicon hairspring impervious to thermal drift and magnetic fields up to 15,000 Gauss.</p>
+          </div>
+          <div class="p-6 bg-charcoal hairline-subtle hover:border-champagne/40 transition-colors">
+            <span class="text-[10px] tracking-ultra text-champagne uppercase">04 / Autonomy</span>
+            <h3 class="font-serif text-2xl text-ivory mt-2">Twin Series Barrels</h3>
+            <p class="text-xs text-titanium mt-2 leading-relaxed">Dual coupled mainsprings deliver flat torque delivery across 72 hours of continuous chronometric reserve.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Technical Specification Explorer -->
+      <div class="bg-charcoal hairline-border p-6 md:p-10 reveal-section">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-ivory/10">
+          <div>
+            <span class="text-[10px] tracking-ultra text-champagne uppercase">Engineering Dossier — Concept Specifications</span>
+            <h3 class="font-serif text-3xl text-ivory mt-1">Technical Specification Explorer</h3>
+          </div>
+          <div class="flex gap-2">
+            <button onclick="switchCaliberSpec('AU01')" id="tab-au01" class="px-4 py-2 text-[10px] tracking-editorial uppercase bg-champagne text-obsidian font-semibold">Caliber AU-01 Skeleton</button>
+            <button onclick="switchCaliberSpec('AU09')" id="tab-au09" class="px-4 py-2 text-[10px] tracking-editorial uppercase bg-obsidian border border-ivory/15 text-titanium hover:text-ivory">Caliber AU-09 Chrono</button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mt-8 items-center">
+          <!-- Animated Blueprint Diagram -->
+          <div class="lg:col-span-5 bg-obsidian p-6 hairline-subtle flex flex-col items-center justify-center relative">
+            <svg class="w-full max-w-[300px] h-auto text-champagne" viewBox="0 0 320 320" fill="none">
+              <circle cx="160" cy="160" r="145" stroke="currentColor" stroke-opacity="0.2" stroke-width="1" stroke-dasharray="4 4" />
+              <circle cx="160" cy="160" r="122" stroke="currentColor" stroke-opacity="0.5" stroke-width="1" />
+              <circle cx="160" cy="160" r="95" stroke="#EAE5DB" stroke-opacity="0.2" stroke-width="0.8" />
+              <!-- Animated Gear Rings -->
+              <g class="animate-spin-slow" style="transform-origin: 160px 160px;">
+                <circle cx="160" cy="160" r="68" stroke="#C5A46D" stroke-width="1.2" stroke-dasharray="8 6" />
+                <line x1="160" y1="92" x2="160" y2="228" stroke="#C5A46D" stroke-opacity="0.4" stroke-width="0.8" />
+                <line x1="92" y1="160" x2="228" y2="160" stroke="#C5A46D" stroke-opacity="0.4" stroke-width="0.8" />
+              </g>
+              <!-- Dimension Callouts -->
+              <line x1="15" y1="160" x2="38" y2="160" stroke="#C5A46D" stroke-width="1" />
+              <line x1="282" y1="160" x2="305" y2="160" stroke="#C5A46D" stroke-width="1" />
+              <text x="160" y="24" text-anchor="middle" fill="#B8B9B6" font-size="8" letter-spacing="3">Ø 41.0 MM ARCHITECTURE</text>
+              <text x="160" y="306" text-anchor="middle" fill="#C5A46D" font-size="8" letter-spacing="3">28,800 VPH / 4 HZ</text>
+              <circle cx="160" cy="160" r="16" stroke="#EAE5DB" stroke-width="1.2" />
+              <circle cx="160" cy="160" r="4" fill="#C5A46D" />
+            </svg>
+            <div class="mt-4 text-center">
+              <span id="spec-caliber-subtitle" class="text-[10px] tracking-ultra text-champagne uppercase">In-House Automatic Openworked</span>
+            </div>
+          </div>
+
+          <!-- 12-Point Specification Grid -->
+          <div id="spec-data-grid" class="lg:col-span-7 grid grid-cols-2 sm:grid-cols-3 gap-4">
+            <!-- Populated via JS -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =====================================================================
+       11. WATCH COMPARISON STUDIO (DUAL INDEPENDENT 3D VIEWPORTS)
+  ====================================================================== -->
+  <section id="comparison" class="py-24 md:py-32 bg-charcoal border-t border-ivory/10">
+    <div class="max-w-[1440px] mx-auto px-5 md:px-10">
+      <div class="max-w-3xl mb-12 reveal-section">
+        <p class="text-[10px] tracking-ultra text-champagne uppercase mb-3">Side-By-Side Horological Analysis</p>
+        <h2 class="font-serif text-4xl sm:text-5xl font-light text-ivory">
+          WATCH <span class="italic text-champagne">COMPARISON STUDIO.</span>
+        </h2>
+        <p class="mt-3 text-sm text-titanium font-light">
+          Select any two AURELION references to inspect their 3D geometry independently and compare calibers, materials, dimensions, and pricing.
+        </p>
+      </div>
+
+      <!-- Dual Selector Bar -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <div class="bg-obsidian p-4 hairline-subtle">
+          <label for="compare-select-a" class="block text-[10px] tracking-ultra text-champagne uppercase mb-2">Reference A</label>
+          <select id="compare-select-a" onchange="updateComparison()" class="w-full bg-charcoal text-ivory text-sm px-4 py-3 border border-ivory/15 focus:border-champagne outline-none"></select>
+        </div>
+        <div class="bg-obsidian p-4 hairline-subtle">
+          <label for="compare-select-b" class="block text-[10px] tracking-ultra text-champagne uppercase mb-2">Reference B</label>
+          <select id="compare-select-b" onchange="updateComparison()" class="w-full bg-charcoal text-ivory text-sm px-4 py-3 border border-ivory/15 focus:border-champagne outline-none"></select>
+        </div>
+      </div>
+
+      <!-- Dual Independent 3D Canvases -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <div class="bg-obsidian hairline-border relative h-[340px] sm:h-[400px] overflow-hidden">
+          <div class="absolute top-4 left-4 z-10 pointer-events-none">
+            <span id="comp-label-a" class="text-xs font-serif text-ivory bg-obsidian/80 px-3 py-1 hairline-subtle">Noir Skeleton Tourbillon</span>
+          </div>
+          <span class="absolute bottom-3 right-4 z-10 text-[9px] tracking-widest uppercase text-titanium/60 pointer-events-none">Drag to Rotate Independently</span>
+          <div id="compare-canvas-a" class="webgl-container w-full h-full cursor-grab active:cursor-grabbing"></div>
+        </div>
+
+        <div class="bg-obsidian hairline-border relative h-[340px] sm:h-[400px] overflow-hidden">
+          <div class="absolute top-4 left-4 z-10 pointer-events-none">
+            <span id="comp-label-b" class="text-xs font-serif text-ivory bg-obsidian/80 px-3 py-1 hairline-subtle">Royale Sovereign Gold</span>
+          </div>
+          <span class="absolute bottom-3 right-4 z-10 text-[9px] tracking-widest uppercase text-titanium/60 pointer-events-none">Drag to Rotate Independently</span>
+          <div id="compare-canvas-b" class="webgl-container w-full h-full cursor-grab active:cursor-grabbing"></div>
+        </div>
+      </div>
+
+      <!-- Structured Specification Comparison Matrix -->
+      <div class="bg-obsidian hairline-subtle overflow-x-auto">
+        <table class="w-full text-left border-collapse min-w-[600px]">
+          <thead>
+            <tr class="border-b border-ivory/10 text-[10px] tracking-ultra uppercase text-champagne">
+              <th class="py-4 px-6 w-1/4">Attribute</th>
+              <th id="comp-th-a" class="py-4 px-6 w-[37.5%]">Reference A</th>
+              <th id="comp-th-b" class="py-4 px-6 w-[37.5%]">Reference B</th>
+            </tr>
+          </thead>
+          <tbody id="comparison-tbody" class="divide-y divide-ivory/10 text-xs text-ivory">
+            <!-- Populated via JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- =====================================================================
+       12. EDITORIAL JOURNAL (LUXURY MAGAZINE ARTICLES)
+  ====================================================================== -->
+  <section id="journal" class="py-24 md:py-32 bg-obsidian border-t border-ivory/10">
+    <div class="max-w-[1440px] mx-auto px-5 md:px-10">
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-14 reveal-section">
+        <div>
+          <p class="text-[10px] tracking-ultra text-champagne uppercase mb-3">Chronicles of the Maison</p>
+          <h2 class="font-serif text-4xl sm:text-5xl font-light text-ivory">
+            THE AURELION <span class="italic text-champagne">JOURNAL.</span>
+          </h2>
+        </div>
+        <p class="text-xs text-titanium max-w-md">Essays on mechanical architecture, material science, and the enduring philosophy of independent watchmaking.</p>
+      </div>
+
+      <div id="journal-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Populated dynamically with 5 editorial articles -->
+      </div>
+    </div>
+  </section>
+
+  <!-- =====================================================================
+       13. PERSONAL LUXURY CONCIERGE
+  ====================================================================== -->
+  <section id="concierge" class="py-24 md:py-32 bg-charcoal border-t border-ivory/10 bg-atelier-grid">
+    <div class="max-w-[1440px] mx-auto px-5 md:px-10">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+        <!-- Left Info -->
+        <div class="lg:col-span-5 space-y-6 reveal-section">
+          <p class="text-[10px] tracking-ultra text-champagne uppercase">Private Client Relations</p>
+          <h2 class="font-serif text-4xl sm:text-5xl font-light text-ivory leading-tight">
+            EXCEPTIONAL SERVICE. <span class="italic text-champagne">PERSONAL ATTENTION.</span>
+          </h2>
+          <p class="text-sm text-titanium leading-relaxed font-light">
+            Whether acquiring a numbered reference, commissioning a bespoke Caliber AU-01 timepiece, or arranging an insured private viewing in Bengaluru or Geneva, our dedicated horological directors are at your disposal.
+          </p>
+
+          <div class="space-y-4 pt-4 border-t border-ivory/10 text-xs">
+            <div class="p-4 bg-obsidian/80 hairline-subtle">
+              <span class="text-[10px] tracking-ultra text-champagne uppercase block">Direct Concierge Channels</span>
+              <div class="mt-3 flex flex-wrap gap-3">
+                <button onclick="showToast('Demo Concierge: WhatsApp Priority Line initialized.')" class="px-4 py-2.5 bg-charcoal hairline-border text-[10px] tracking-editorial uppercase text-ivory hover:border-champagne hover:text-champagne transition-colors">
+                  WhatsApp Concierge
+                </button>
+                <button onclick="showToast('Demo Concierge: Email draft prepared for privateclient@aurelion-horlogerie.example')" class="px-4 py-2.5 bg-charcoal hairline-subtle text-[10px] tracking-editorial uppercase text-titanium hover:text-ivory transition-colors">
+                  Email Atelier Director
+                </button>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4 text-titanium">
+              <div>
+                <p class="text-ivory font-medium mb-1">Bengaluru Salon</p>
+                <p class="text-[11px] leading-relaxed">Private Lounge, Level 2<br/>Vittal Mallya Road, Bengaluru<br/>By Appointment Only</p>
+              </div>
+              <div>
+                <p class="text-ivory font-medium mb-1">Geneva Manufacture</p>
+                <p class="text-[11px] leading-relaxed">Atelier Haute Horlogerie<br/>1204 Genève, Switzerland<br/>Mon – Sat, 10:00 – 19:00 CET</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Consultation Form -->
+        <div class="lg:col-span-7 bg-obsidian hairline-border p-6 md:p-10">
+          <form id="concierge-form" onsubmit="handleConciergeSubmit(event)" class="space-y-5">
+            <div class="flex items-center justify-between border-b border-ivory/10 pb-4">
+              <span class="font-serif text-2xl text-ivory">Request Private Consultation</span>
+              <span class="text-[10px] tracking-editorial text-champagne uppercase">Response Within 4 Hours</span>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <div>
+                <label class="block text-[10px] tracking-editorial uppercase text-titanium mb-2">Full Name *</label>
+                <input type="text" name="name" required placeholder="e.g., Arjun Mehta" class="w-full bg-charcoal border border-ivory/15 px-4 py-3 text-sm text-ivory focus:border-champagne outline-none" />
+              </div>
+              <div>
+                <label class="block text-[10px] tracking-editorial uppercase text-titanium mb-2">Email Address *</label>
+                <input type="email" name="email" required placeholder="client@domain.com" class="w-full bg-charcoal border border-ivory/15 px-4 py-3 text-sm text-ivory focus:border-champagne outline-none" />
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <div>
+                <label class="block text-[10px] tracking-editorial uppercase text-titanium mb-2">Telephone (India / International) *</label>
+                <input type="tel" name="phone" required placeholder="+91 98XXX XXXXX" class="w-full bg-charcoal border border-ivory/15 px-4 py-3 text-sm text-ivory focus:border-champagne outline-none" />
+              </div>
+              <div>
+                <label class="block text-[10px] tracking-editorial uppercase text-titanium mb-2">Consultation Format</label>
+                <select name="salon" class="w-full bg-charcoal border border-ivory/15 px-4 py-3 text-sm text-ivory focus:border-champagne outline-none">
+                  <option>Bengaluru Flagship Private Salon</option>
+                  <option>Geneva Manufacture Atelier</option>
+                  <option>Private Virtual Horological Viewing</option>
+                  <option>Bespoke Sur-Mesure Commission</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-[10px] tracking-editorial uppercase text-titanium mb-2">Timepiece of Interest</label>
+              <select id="concierge-watch-select" name="watch" class="w-full bg-charcoal border border-ivory/15 px-4 py-3 text-sm text-ivory focus:border-champagne outline-none"></select>
+            </div>
+
+            <div>
+              <label class="block text-[10px] tracking-editorial uppercase text-titanium mb-2">Personal Notes &amp; Preferred Date</label>
+              <textarea name="notes" rows="3" placeholder="Specify preferred date, wrist sizing, or bespoke engraving inquiries..." class="w-full bg-charcoal border border-ivory/15 px-4 py-3 text-sm text-ivory focus:border-champagne outline-none"></textarea>
+            </div>
+
+            <button type="submit" class="w-full py-4 bg-champagne text-obsidian font-semibold text-xs tracking-editorial uppercase hover:bg-ivory transition-colors">
+              Confirm Private Appointment Request
+            </button>
+          </form>
+
+          <!-- Confirmation State -->
+          <div id="concierge-confirmation" class="hidden py-10 text-center space-y-4">
+            <div class="w-12 h-12 mx-auto rounded-full border border-champagne flex items-center justify-center text-champagne text-xl">&#10003;</div>
+            <p class="text-[10px] tracking-ultra text-champagne uppercase">Dossier Registered</p>
+            <h3 class="font-serif text-3xl text-ivory">Your Private Consultation Is Confirmed</h3>
+            <p id="concierge-ref-msg" class="text-xs text-titanium max-w-md mx-auto leading-relaxed"></p>
+            <button onclick="resetConciergeForm()" class="mt-4 px-6 py-2.5 bg-charcoal hairline-border text-[10px] tracking-editorial uppercase text-ivory hover:border-champagne">
+              Submit Another Inquiry
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =====================================================================
+       14. PREMIUM ARCHITECTURAL FOOTER
+  ====================================================================== -->
+  <footer class="bg-obsidian border-t border-ivory/10 pt-20 pb-12">
+    <div class="max-w-[1440px] mx-auto px-5 md:px-10">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 pb-16 border-b border-ivory/10">
+        <!-- Brand Column -->
+        <div class="lg:col-span-4 space-y-5">
+          <div class="flex items-center gap-3">
+            <svg class="w-7 h-7 text-champagne" viewBox="0 0 48 48" fill="none">
+              <circle cx="24" cy="24" r="21" stroke="currentColor" stroke-width="1" stroke-opacity="0.45" />
+              <polygon points="24,7 39,37 33,37 24,18 15,37 9,37" stroke="currentColor" stroke-width="1.4" />
+              <line x1="16" y1="29" x2="32" y2="29" stroke="currentColor" stroke-width="1.2" />
+            </svg>
+            <span class="font-serif text-2xl tracking-ultra text-ivory">AURELION</span>
+          </div>
+          <p class="text-xs tracking-editorial text-champagne uppercase">The Art of Precision. The Beauty of Time.</p>
+          <p class="text-xs text-titanium leading-relaxed max-w-sm">
+            Independent mechanical watchmaking combining Swiss horological discipline with architectural modernism. Each timepiece is individually numbered and certified.
+          </p>
+
+          <!-- Region / Currency Switcher -->
+          <div class="pt-2">
+            <label for="currency-selector" class="block text-[9px] tracking-ultra text-titanium uppercase mb-1.5">Boutique Region &amp; Valuation</label>
+            <select id="currency-selector" onchange="changeDisplayCurrency(this.value)" class="bg-charcoal border border-ivory/15 px-3.5 py-2 text-xs text-ivory outline-none focus:border-champagne">
+              <option value="INR">India — INR (₹)</option>
+              <option value="CHF">Switzerland — CHF (Fr.)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Links 1 -->
+        <div class="lg:col-span-2 space-y-3 text-xs">
+          <p class="text-[10px] tracking-ultra text-champagne uppercase mb-4">The Maison</p>
+          <a href="#collections" class="block text-titanium hover:text-ivory transition-colors">Collections</a>
+          <a href="#craft-specs" class="block text-titanium hover:text-ivory transition-colors">Our Story &amp; Craft</a>
+          <a href="#movement-lab" class="block text-titanium hover:text-ivory transition-colors">The Movement</a>
+          <a href="#bespoke" class="block text-titanium hover:text-ivory transition-colors">Bespoke Studio</a>
+          <a href="#journal" class="block text-titanium hover:text-ivory transition-colors">Editorial Journal</a>
+        </div>
+
+        <!-- Links 2 -->
+        <div class="lg:col-span-2 space-y-3 text-xs">
+          <p class="text-[10px] tracking-ultra text-champagne uppercase mb-4">Client Care</p>
+          <a href="#concierge" class="block text-titanium hover:text-ivory transition-colors">Contact Concierge</a>
+          <button onclick="openPolicyModal('5-Year International Warranty', 'Every AURELION timepiece is covered by a 5-year international manufacture warranty against mechanical and material defects, serviced exclusively at our Geneva or Bengaluru ateliers.')" class="block text-left text-titanium hover:text-ivory transition-colors">Warranty</button>
+          <button onclick="openPolicyModal('Insured Armored Delivery', 'All domestic Indian and international deliveries are dispatched via high-security insured armored courier with biometric signature verification at zero cost to the collector.')" class="block text-left text-titanium hover:text-ivory transition-colors">Armored Shipping</button>
+          <button onclick="openPolicyModal('Collector Return & Exchange', 'Unworn timepieces in original sealed presentation coffrets may be returned or exchanged within 14 days of delivery, excluding bespoke Sur-Mesure commissions.')" class="block text-left text-titanium hover:text-ivory transition-colors">Returns</button>
+          <button onclick="openPolicyModal('Privacy & Confidentiality', 'Client dossiers, bespoke specifications, and ownership registries are encrypted and maintained under strict Swiss privacy standards.')" class="block text-left text-titanium hover:text-ivory transition-colors">Privacy &amp; Terms</button>
+        </div>
+
+        <!-- Newsletter -->
+        <div class="lg:col-span-4 space-y-4">
+          <p class="text-[10px] tracking-ultra text-champagne uppercase">Private Dispatch</p>
+          <p class="text-xs text-titanium leading-relaxed">Receive private invitations to limited-edition releases, Geneva salon previews, and horological monographs.</p>
+          <form onsubmit="handleNewsletterSubmit(event)" class="flex gap-2">
+            <input type="email" required placeholder="Enter your email address" class="flex-1 bg-charcoal border border-ivory/15 px-4 py-3 text-xs text-ivory focus:border-champagne outline-none" />
+            <button type="submit" class="px-5 py-3 bg-champagne text-obsidian text-[10px] font-semibold tracking-editorial uppercase hover:bg-ivory transition-colors">Subscribe</button>
+          </form>
+          <div class="flex gap-5 pt-2 text-[10px] tracking-editorial uppercase text-titanium">
+            <a href="#hero" class="hover:text-champagne transition-colors">Instagram</a>
+            <a href="#hero" class="hover:text-champagne transition-colors">YouTube</a>
+            <a href="#hero" class="hover:text-champagne transition-colors">LinkedIn</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-titanium/60">
+        <p>&copy; 2026 AURELION Haute Horlogerie. All rights reserved. Fictional luxury concept flagship.</p>
+        <p class="tracking-widest uppercase text-[9px]">Swiss Engineered • Crafted For Eternity</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- =====================================================================
+       MODAL: IMMERSIVE PRODUCT DETAIL EXPERIENCE (WITH LIVE 3D VIEWER)
+  ====================================================================== -->
+  <div id="product-modal" class="fixed inset-0 z-[80] bg-obsidian/95 backdrop-blur-xl hidden overflow-y-auto">
+    <div class="max-w-[1360px] mx-auto px-5 md:px-10 py-8">
+      <!-- Top Bar -->
+      <div class="flex items-center justify-between border-b border-ivory/10 pb-5 mb-8">
+        <div class="flex items-center gap-3">
+          <span id="pdp-collection-tag" class="text-[10px] tracking-ultra text-champagne uppercase">AURELION NOIR</span>
+          <span class="text-titanium/40">/</span>
+          <span id="pdp-ref-tag" class="text-[10px] font-mono text-titanium">REF. AU-701</span>
+        </div>
+        <button onclick="closeProductModal()" class="px-4 py-2 bg-charcoal hairline-subtle text-xs tracking-editorial uppercase text-ivory hover:border-champagne hover:text-champagne transition-colors">
+          Close Dossier &times;
+        </button>
+      </div>
+
+      <!-- Main 2-Column Layout -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
+        <!-- Left: Live 3D Watch Stage -->
+        <div class="lg:col-span-7 space-y-4">
+          <div class="relative bg-charcoal hairline-border h-[420px] sm:h-[520px] overflow-hidden">
+            <div class="absolute top-4 left-4 z-10 flex flex-wrap gap-2">
+              <button onclick="setPdpCamera('front')" class="px-3 py-1.5 bg-obsidian/85 hairline-subtle text-[10px] tracking-editorial uppercase text-ivory hover:border-champagne">Front</button>
+              <button onclick="setPdpCamera('side')" class="px-3 py-1.5 bg-obsidian/85 hairline-subtle text-[10px] tracking-editorial uppercase text-ivory hover:border-champagne">Profile</button>
+              <button onclick="setPdpCamera('back')" class="px-3 py-1.5 bg-obsidian/85 hairline-subtle text-[10px] tracking-editorial uppercase text-ivory hover:border-champagne">Caseback</button>
+              <button onclick="togglePdpExplode()" id="pdp-explode-btn" class="px-3 py-1.5 bg-champagne text-obsidian font-semibold text-[10px] tracking-editorial uppercase hover:bg-ivory">Explode Caliber</button>
+            </div>
+            <div id="pdp-canvas-container" class="webgl-container w-full h-full cursor-grab active:cursor-grabbing"></div>
+            <div class="absolute bottom-4 right-4 z-10 text-[10px] tracking-widest uppercase text-titanium/70 bg-obsidian/75 px-3 py-1">
+              Interactive 360° 3D Timepiece
+            </div>
+          </div>
+
+          <!-- Craftsmanship & Warranty Highlights -->
+          <div class="grid grid-cols-3 gap-4">
+            <div class="p-4 bg-charcoal hairline-subtle">
+              <span class="text-[9px] tracking-ultra text-champagne uppercase block">Water Resistance</span>
+              <span id="pdp-wr" class="text-sm text-ivory font-medium mt-1 block">100m / 10 ATM</span>
+            </div>
+            <div class="p-4 bg-charcoal hairline-subtle">
+              <span class="text-[9px] tracking-ultra text-champagne uppercase block">Power Reserve</span>
+              <span id="pdp-pr" class="text-sm text-ivory font-medium mt-1 block">72 Hours</span>
+            </div>
+            <div class="p-4 bg-charcoal hairline-subtle">
+              <span class="text-[9px] tracking-ultra text-champagne uppercase block">Guarantee</span>
+              <span class="text-sm text-ivory font-medium mt-1 block">5-Year International</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Purchase & Specification Controls -->
+        <div class="lg:col-span-5 flex flex-col justify-between space-y-6">
+          <div class="space-y-4">
+            <div class="inline-flex items-center gap-2 px-3 py-1 bg-charcoal border border-champagne/30 text-[10px] tracking-editorial uppercase text-champagne">
+              <span class="w-1.5 h-1.5 rounded-full bg-champagne"></span>
+              <span id="pdp-availability">Limited Allocation — Available</span>
+            </div>
+
+            <h2 id="pdp-title" class="font-serif text-4xl sm:text-5xl font-light text-ivory">Noir Skeleton Tourbillon</h2>
+            <div id="pdp-price" class="font-serif text-3xl text-champagne">₹18,50,000</div>
+
+            <p id="pdp-description" class="text-sm text-titanium leading-relaxed font-light"></p>
+
+            <!-- Strap Option Selector -->
+            <div class="pt-4 border-t border-ivory/10">
+              <label class="block text-[10px] tracking-ultra text-champagne uppercase mb-2.5">Select Strap / Bracelet</label>
+              <div class="grid grid-cols-2 gap-2" id="pdp-strap-options">
+                <button onclick="selectPdpStrap('FKM Vulcanized Rubber', 'rubber')" class="pdp-strap-btn px-3 py-2.5 bg-charcoal border border-champagne text-xs text-ivory text-left">FKM Vulcanized Rubber</button>
+                <button onclick="selectPdpStrap('Integrated Metal Bracelet', 'bracelet')" class="pdp-strap-btn px-3 py-2.5 bg-charcoal border border-ivory/15 text-xs text-titanium text-left">Integrated Metal Bracelet</button>
+              </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-4">
+              <button id="pdp-add-bag-btn" class="py-4 bg-champagne text-obsidian font-semibold text-xs tracking-editorial uppercase hover:bg-ivory transition-colors">
+                Add To Bag
+              </button>
+              <button id="pdp-buy-now-btn" class="py-4 bg-charcoal hairline-border text-ivory text-xs tracking-editorial uppercase hover:border-champagne hover:text-champagne transition-colors">
+                Acquire Now
+              </button>
+            </div>
+            <button id="pdp-wishlist-btn" class="w-full py-3 bg-obsidian hairline-subtle text-[11px] tracking-editorial uppercase text-titanium hover:text-champagne transition-colors">
+              Save to Collector Wishlist
+            </button>
+          </div>
+
+          <!-- Technical Specifications Table -->
+          <div class="bg-charcoal/70 hairline-subtle p-5 space-y-2.5 text-xs">
+            <p class="text-[10px] tracking-ultra text-champagne uppercase mb-2">Technical Specifications</p>
+            <div class="flex justify-between py-1.5 border-b border-ivory/10">
+              <span class="text-titanium">Movement Caliber</span>
+              <span id="pdp-caliber" class="text-ivory">Caliber AU-01 Automatic</span>
+            </div>
+            <div class="flex justify-between py-1.5 border-b border-ivory/10">
+              <span class="text-titanium">Case Material</span>
+              <span id="pdp-case" class="text-ivory">Grade 5 Black DLC Titanium</span>
+            </div>
+            <div class="flex justify-between py-1.5 border-b border-ivory/10">
+              <span class="text-titanium">Dimensions</span>
+              <span id="pdp-dimensions" class="text-ivory">41.0 mm &times; 9.8 mm</span>
+            </div>
+            <div class="flex justify-between py-1.5">
+              <span class="text-titanium">Crystal</span>
+              <span class="text-ivory">Box-Domed Anti-Reflective Sapphire</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       MODAL: EDITORIAL JOURNAL ARTICLE READER
+  ====================================================================== -->
+  <div id="article-modal" class="fixed inset-0 z-[85] bg-obsidian/95 backdrop-blur-xl hidden overflow-y-auto">
+    <div class="max-w-3xl mx-auto px-6 py-12">
+      <div class="flex items-center justify-between border-b border-ivory/10 pb-5 mb-10">
+        <span id="article-category" class="text-[10px] tracking-ultra text-champagne uppercase">Horological Monograph</span>
+        <button onclick="closeArticleModal()" class="text-xs tracking-editorial uppercase text-titanium hover:text-champagne">Close Article &times;</button>
+      </div>
+      <h2 id="article-title" class="font-serif text-4xl sm:text-5xl font-light text-ivory leading-tight mb-4"></h2>
+      <div id="article-meta" class="text-xs text-titanium mb-8 pb-6 border-b border-ivory/10"></div>
+      <div id="article-body" class="space-y-6 text-sm sm:text-base text-ivory/90 leading-relaxed font-light"></div>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       MODAL: LIVE CATALOGUE SEARCH OVERLAY
+  ====================================================================== -->
+  <div id="search-modal" class="fixed inset-0 z-[85] bg-obsidian/95 backdrop-blur-xl hidden overflow-y-auto">
+    <div class="max-w-4xl mx-auto px-6 py-14">
+      <div class="flex items-center justify-between mb-8">
+        <span class="text-[10px] tracking-ultra text-champagne uppercase">Search Maison Archives</span>
+        <button onclick="closeSearchModal()" class="text-xs tracking-editorial uppercase text-titanium hover:text-ivory">Close &times;</button>
+      </div>
+      <input id="search-input" type="text" oninput="performSearch(this.value)" placeholder="Search timepieces, calibers, titanium, gold, journal..." class="w-full bg-transparent border-b border-champagne pb-4 font-serif text-3xl sm:text-4xl text-ivory placeholder-titanium/40 outline-none" />
+      <div id="search-results" class="mt-10 grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       DRAWER: LUXURY SHOPPING BAG, WISHLIST & DEMO CHECKOUT FLOW
+  ====================================================================== -->
+  <div id="side-drawer" class="fixed inset-0 z-[85] bg-obsidian/80 backdrop-blur-sm hidden justify-end">
+    <div class="w-full max-w-lg bg-charcoal border-l border-ivory/15 h-full flex flex-col justify-between overflow-y-auto">
+      <!-- Drawer Header -->
+      <div class="p-6 border-b border-ivory/10 flex items-center justify-between sticky top-0 bg-charcoal z-10">
+        <div class="flex gap-6">
+          <button onclick="switchDrawerTab('bag')" id="drawer-tab-bag" class="text-xs tracking-editorial uppercase text-champagne border-b border-champagne pb-1">Shopping Bag (<span id="drawer-bag-count">0</span>)</button>
+          <button onclick="switchDrawerTab('wishlist')" id="drawer-tab-wishlist" class="text-xs tracking-editorial uppercase text-titanium pb-1">Wishlist (<span id="drawer-wish-count">0</span>)</button>
+        </div>
+        <button onclick="closeDrawer()" class="text-lg text-titanium hover:text-ivory">&times;</button>
+      </div>
+
+      <!-- Bag View -->
+      <div id="drawer-bag-view" class="flex-1 flex flex-col justify-between p-6">
+        <div id="bag-items-container" class="space-y-4"></div>
+
+        <div id="bag-summary-footer" class="pt-6 border-t border-ivory/10 mt-6 space-y-4">
+          <div class="space-y-2 text-xs">
+            <div class="flex justify-between text-titanium">
+              <span>Subtotal</span>
+              <span id="bag-subtotal" class="text-ivory">₹0</span>
+            </div>
+            <div class="flex justify-between text-titanium">
+              <span>Insured Armored Courier</span>
+              <span class="text-champagne">Complimentary</span>
+            </div>
+            <div class="flex justify-between text-sm font-medium pt-2 border-t border-ivory/10">
+              <span class="uppercase tracking-wider">Total Valuation</span>
+              <span id="bag-total" class="font-serif text-2xl text-champagne">₹0</span>
+            </div>
+          </div>
+          <button onclick="openCheckoutView()" class="w-full py-4 bg-champagne text-obsidian font-semibold text-xs tracking-editorial uppercase hover:bg-ivory transition-colors">
+            Proceed to Private Checkout
+          </button>
+        </div>
+      </div>
+
+      <!-- Wishlist View -->
+      <div id="drawer-wishlist-view" class="hidden flex-1 p-6 space-y-4">
+        <div id="wishlist-items-container" class="space-y-4"></div>
+      </div>
+
+      <!-- Demo Checkout View -->
+      <div id="drawer-checkout-view" class="hidden flex-1 p-6 space-y-5">
+        <div class="flex items-center justify-between border-b border-ivory/10 pb-3">
+          <button onclick="switchDrawerTab('bag')" class="text-[10px] tracking-editorial uppercase text-champagne">&larr; Back to Bag</button>
+          <span class="text-[9px] tracking-widest uppercase px-2 py-0.5 bg-obsidian text-titanium border border-ivory/10">Demo Acquisition Flow</span>
+        </div>
+
+        <form id="checkout-form" onsubmit="handleCheckoutSubmit(event)" class="space-y-4 text-xs">
+          <p class="font-serif text-2xl text-ivory">Client &amp; Delivery Dossier</p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-[10px] uppercase tracking-wider text-titanium mb-1">Full Legal Name *</label>
+              <input type="text" name="fullName" required placeholder="Vikramaditya Rao" class="w-full bg-obsidian border border-ivory/15 px-3.5 py-2.5 text-ivory outline-none focus:border-champagne" />
+            </div>
+            <div>
+              <label class="block text-[10px] uppercase tracking-wider text-titanium mb-1">Mobile Number *</label>
+              <input type="tel" name="phone" required placeholder="+91 98450 XXXXX" class="w-full bg-obsidian border border-ivory/15 px-3.5 py-2.5 text-ivory outline-none focus:border-champagne" />
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-[10px] uppercase tracking-wider text-titanium mb-1">Email for Certificate Registry *</label>
+            <input type="email" name="email" required placeholder="collector@domain.in" class="w-full bg-obsidian border border-ivory/15 px-3.5 py-2.5 text-ivory outline-none focus:border-champagne" />
+          </div>
+
+          <div>
+            <label class="block text-[10px] uppercase tracking-wider text-titanium mb-1">Street Address / Residence *</label>
+            <input type="text" name="address" required placeholder="42 Lavelle Road, Shanthala Nagar" class="w-full bg-obsidian border border-ivory/15 px-3.5 py-2.5 text-ivory outline-none focus:border-champagne" />
+          </div>
+
+          <div class="grid grid-cols-3 gap-3">
+            <div>
+              <label class="block text-[10px] uppercase tracking-wider text-titanium mb-1">City *</label>
+              <input type="text" name="city" required value="Bengaluru" class="w-full bg-obsidian border border-ivory/15 px-3.5 py-2.5 text-ivory outline-none focus:border-champagne" />
+            </div>
+            <div>
+              <label class="block text-[10px] uppercase tracking-wider text-titanium mb-1">State *</label>
+              <input type="text" name="state" required value="Karnataka" class="w-full bg-obsidian border border-ivory/15 px-3.5 py-2.5 text-ivory outline-none focus:border-champagne" />
+            </div>
+            <div>
+              <label class="block text-[10px] uppercase tracking-wider text-titanium mb-1">PIN Code *</label>
+              <input type="text" name="pincode" required pattern="[0-9]{6}" placeholder="560001" class="w-full bg-obsidian border border-ivory/15 px-3.5 py-2.5 text-ivory outline-none focus:border-champagne" />
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-[10px] uppercase tracking-wider text-titanium mb-1">Settlement Method (Demo)</label>
+            <select name="payment" class="w-full bg-obsidian border border-ivory/15 px-3.5 py-2.5 text-ivory outline-none focus:border-champagne">
+              <option>Private Wire Transfer / RTGS (Complimentary Insurance)</option>
+              <option>Private Client Concierge Escrow</option>
+              <option>Demo Prestige Card Simulation</option>
+            </select>
+          </div>
+
+          <div class="p-3.5 bg-obsidian border border-champagne/30 text-[11px] text-titanium">
+            <strong class="text-champagne">Note:</strong> This is a demonstration luxury checkout experience. No real financial transaction will be charged.
+          </div>
+
+          <button type="submit" class="w-full py-4 bg-champagne text-obsidian font-semibold text-xs tracking-editorial uppercase hover:bg-ivory transition-colors">
+            Complete Demo Acquisition
+          </button>
+        </form>
+      </div>
+
+      <!-- Order Confirmation Certificate View -->
+      <div id="drawer-confirm-view" class="hidden flex-1 p-6 flex flex-col justify-center text-center space-y-5">
+        <div class="p-8 bg-obsidian hairline-border space-y-4">
+          <div class="w-12 h-12 mx-auto rounded-full border border-champagne flex items-center justify-center text-champagne text-xl">&#10003;</div>
+          <p class="text-[10px] tracking-ultra text-champagne uppercase">Official Demo Allocation Certificate</p>
+          <h3 class="font-serif text-3xl text-ivory">Acquisition Registered</h3>
+          <p id="order-cert-details" class="text-xs text-titanium leading-relaxed"></p>
+          <div class="pt-4 border-t border-ivory/10 text-[10px] font-mono text-champagne" id="order-cert-id"></div>
+        </div>
+        <button onclick="closeDrawer(); switchDrawerTab('bag');" class="w-full py-3.5 bg-champagne text-obsidian font-semibold text-xs tracking-editorial uppercase">
+          Return to Flagship
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       POLICY / INFO LIGHTBOX MODAL
+  ====================================================================== -->
+  <div id="policy-modal" class="fixed inset-0 z-[90] bg-obsidian/90 backdrop-blur-md hidden items-center justify-center p-6">
+    <div class="max-w-lg w-full bg-charcoal hairline-border p-8 space-y-4">
+      <p class="text-[10px] tracking-ultra text-champagne uppercase">Aurelion Maison Charter</p>
+      <h3 id="policy-modal-title" class="font-serif text-3xl text-ivory"></h3>
+      <p id="policy-modal-text" class="text-sm text-titanium leading-relaxed"></p>
+      <div class="pt-4">
+        <button onclick="closePolicyModal()" class="px-6 py-2.5 bg-champagne text-obsidian text-xs font-semibold tracking-editorial uppercase">Acknowledge</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       APPLICATION JAVASCRIPT: THREE.JS PROCEDURAL HOROLOGY ENGINE & UI STATE
+  ====================================================================== -->
+  <script>
+    /* -----------------------------------------------------------------------
+       1. HOROLOGICAL DATA MODELS (8 TIMEPIECES, 15 COMPONENTS, ARTICLES)
+    ----------------------------------------------------------------------- */
+    const WATCH_CATALOGUE = [
+      {
+        id: 'au-noir-01',
+        ref: 'AU-701.TI',
+        name: 'Noir Skeleton Tourbillon',
+        collection: 'AURELION NOIR',
+        priceINR: 1850000,
+        availability: 'Limited Allocation — 25 Pieces',
+        caseMaterial: 'Grade 5 DLC Black Titanium',
+        caseType: 'ceramic',
+        dialType: 'skeleton',
+        strapType: 'rubber',
+        handsType: 'gold',
+        caliber: 'Caliber AU-01 Openworked',
+        powerReserve: '72 Hours',
+        dimensions: '41.0 mm × 9.8 mm',
+        waterResistance: '100m / 10 ATM',
+        strapLabel: 'FKM Vulcanized Black Rubber',
+        description: 'Architectural openworked architecture housed in micro-blasted Grade 5 black titanium. Skeletonized bridges reveal the 4 Hz free-sprung balance and twin mainspring barrels.'
+      },
+      {
+        id: 'au-noir-02',
+        ref: 'AU-704.CE',
+        name: 'Noir Phantom Monolith',
+        collection: 'AURELION NOIR',
+        priceINR: 1280000,
+        availability: 'Available — Immediate Allocation',
+        caseMaterial: 'Matte Zirconium Ceramic',
+        caseType: 'ceramic',
+        dialType: 'obsidian',
+        strapType: 'rubber',
+        handsType: 'silver',
+        caliber: 'Caliber AU-03 Automatic',
+        powerReserve: '72 Hours',
+        dimensions: '40.5 mm × 9.4 mm',
+        waterResistance: '100m / 10 ATM',
+        strapLabel: 'FKM Vulcanized Black Rubber',
+        description: 'Stealth monochromatic execution milled from high-density black ceramic with hand-chamfered rhodium indices and sunray obsidian dial.'
+      },
+      {
+        id: 'au-royale-01',
+        ref: 'AU-102.RG',
+        name: 'Royale Sovereign Gold',
+        collection: 'AURELION ROYALE',
+        priceINR: 1640000,
+        availability: 'Available — Geneva Atelier',
+        caseMaterial: '18k Champagne Gold',
+        caseType: 'gold',
+        dialType: 'ivory',
+        strapType: 'bracelet',
+        handsType: 'gold',
+        caliber: 'Caliber AU-01 Automatic',
+        powerReserve: '72 Hours',
+        dimensions: '40.0 mm × 8.9 mm',
+        waterResistance: '50m / 5 ATM',
+        strapLabel: '18k Gold Integrated Bracelet',
+        description: 'Timeless Geneva dress horology sculpted in solid 18k champagne gold with a grand-feu warm ivory dial and mirror-polished dauphine hands.'
+      },
+      {
+        id: 'au-royale-02',
+        ref: 'AU-108.PT',
+        name: 'Royale Platinium Perpetuelle',
+        collection: 'AURELION ROYALE',
+        priceINR: 2450000,
+        availability: 'Numbered Edition — 12 Pieces',
+        caseMaterial: '950 Solid Platinum',
+        caseType: 'platinum',
+        dialType: 'midnight',
+        strapType: 'bracelet',
+        handsType: 'silver',
+        caliber: 'Caliber AU-05 Perpetual',
+        powerReserve: '80 Hours',
+        dimensions: '40.5 mm × 9.6 mm',
+        waterResistance: '50m / 5 ATM',
+        strapLabel: '950 Platinum Articulated Link',
+        description: 'Forged in dense 950 platinum with a deep midnight-blue guilloché dial and 22k gold openworked winding rotor visible through the sapphire exhibition back.'
+      },
+      {
+        id: 'au-chronos-01',
+        ref: 'AU-301.TI',
+        name: 'Chronos Rattrapante TI',
+        collection: 'AURELION CHRONOS',
+        priceINR: 1490000,
+        availability: 'Available — Limited Batch',
+        caseMaterial: 'Brushed Grade 5 Titanium',
+        caseType: 'titanium',
+        dialType: 'skeleton',
+        strapType: 'bracelet',
+        handsType: 'gold',
+        caliber: 'Caliber AU-09 Column-Wheel',
+        powerReserve: '68 Hours',
+        dimensions: '42.0 mm × 11.2 mm',
+        waterResistance: '100m / 10 ATM',
+        strapLabel: 'Grade 5 Titanium Bracelet',
+        description: 'High-frequency split-seconds chronograph engineered with a horizontal clutch, column-wheel actuation, and gold-accented chronograph registers.'
+      },
+      {
+        id: 'au-chronos-02',
+        ref: 'AU-309.AU',
+        name: 'Chronos Regatta Gold',
+        collection: 'AURELION CHRONOS',
+        priceINR: 1920000,
+        availability: 'Available — Made to Order',
+        caseMaterial: '18k Champagne Gold & Ceramic',
+        caseType: 'gold',
+        dialType: 'obsidian',
+        strapType: 'rubber',
+        handsType: 'gold',
+        caliber: 'Caliber AU-09 Flyback',
+        powerReserve: '68 Hours',
+        dimensions: '42.0 mm × 11.0 mm',
+        waterResistance: '150m / 15 ATM',
+        strapLabel: 'FKM Vulcanized Black Rubber',
+        description: 'Built for maritime precision with flyback chronograph reset, tachymeter bezel scale, and screw-down fluted crown.'
+      },
+      {
+        id: 'au-infinite-01',
+        ref: 'AU-901.TI',
+        name: 'Infinite Horizon Openworked',
+        collection: 'AURELION INFINITE',
+        priceINR: 2180000,
+        availability: 'Atelier Allocation — 15 Pieces',
+        caseMaterial: 'Micro-Blasted Grade 5 Titanium',
+        caseType: 'titanium',
+        dialType: 'skeleton',
+        strapType: 'rubber',
+        handsType: 'silver',
+        caliber: 'Caliber AU-11 Architectural',
+        powerReserve: '96 Hours',
+        dimensions: '41.5 mm × 9.5 mm',
+        waterResistance: '100m / 10 ATM',
+        strapLabel: 'FKM Vulcanized Black Rubber',
+        description: 'Cantilevered titanium bridges suspend the gear train in three-dimensional space, creating dramatic architectural depth.'
+      },
+      {
+        id: 'au-infinite-02',
+        ref: 'AU-905.PT',
+        name: 'Infinite Celestial Emerald-Blue',
+        collection: 'AURELION INFINITE',
+        priceINR: 485000,
+        availability: 'Collector Entry Reference',
+        caseMaterial: '904L Surgical Steel & Titanium',
+        caseType: 'platinum',
+        dialType: 'midnight',
+        strapType: 'rubber',
+        handsType: 'gold',
+        caliber: 'Caliber AU-02 Automatic',
+        powerReserve: '72 Hours',
+        dimensions: '39.5 mm × 8.8 mm',
+        waterResistance: '100m / 10 ATM',
+        strapLabel: 'FKM Vulcanized Black Rubber',
+        description: 'Pure architectural proportions with a sunray midnight dial, champagne gold baton markers, and signature 28,800 vph automatic caliber.'
+      }
+    ];
+
+    const WATCH_COMPONENTS_15 = [
+      { id: 1, key: 'crystal', name: 'Domed Sapphire Crystal', material: '9-Mohs Synthetic Corundum', purpose: 'Protects the dial and movement with dual-sided anti-reflective optical clarity.', finish: 'Box-Domed & Diamond Polished', axis: [0, 0, 2.35] },
+      { id: 2, key: 'bezel', name: 'Architectural Bezel', material: 'Grade 5 Titanium / 18k Gold', purpose: 'Secures the upper sapphire gasket and frames the timepiece geometry.', finish: 'Satin Brushed Top with Mirror Bevel', axis: [0, 0, 1.85] },
+      { id: 3, key: 'hands', name: 'Dauphine Skeleton Hands', material: 'Diamond-Cut Brass / 18k Gold', purpose: 'Indicates hours, minutes, and sweeping 1/8th-second intervals.', finish: 'Faceted & Hand-Poised', axis: [0, 0, 1.42] },
+      { id: 4, key: 'dial', name: 'Openworked Chapter Ring & Dial', material: 'Galvanic Brass & Sapphire', purpose: 'Displays precision minute tracks while revealing the mechanical caliber beneath.', finish: 'Circular Satin & Guilloché', axis: [0, 0, 1.05] },
+      { id: 5, key: 'markers', name: 'Applied Baton Hour Markers', material: '18k Champagne Gold', purpose: 'Twelve hand-riveted indices providing high-contrast legibility.', finish: 'Diamond-Faceted Three-Plane', axis: [0, 0, 0.72] },
+      { id: 6, key: 'gears', name: 'Primary Gear Train', material: 'CuBe Beryllium-Copper & Steel', purpose: 'Transmits rotational energy from the mainspring barrel to the escapement.', finish: 'Circular Grained & Gold-Flashed', axis: [0, 0, 0.35] },
+      { id: 7, key: 'balance', name: 'Free-Sprung Balance Wheel', material: 'Glucydur & Silicon Hairspring', purpose: 'Regulates chronometric timekeeping at 28,800 vibrations per hour (4 Hz).', finish: 'Variable-Inertia Gold Poising', axis: [0.45, -0.35, 0.12] },
+      { id: 8, key: 'escapement', name: 'Swiss Lever Escapement', material: 'Hardened Steel & Synthetic Ruby', purpose: 'Locks and releases the gear train 8 times per second in rhythmic impulses.', finish: 'Mirror-Polished Pallet Forks', axis: [-0.45, -0.3, -0.12] },
+      { id: 9, key: 'barrel', name: 'Twin Mainspring Barrel', material: 'Nivaflex Alloy & Titanium Drum', purpose: 'Stores 72 hours of mechanical energy wound by wrist motion or crown.', finish: 'Snailed & Openworked Cover', axis: [-0.35, 0.42, -0.38] },
+      { id: 10, key: 'rotor', name: '22k Gold Automatic Rotor', material: '22k Solid Champagne Gold', purpose: 'Bi-directional oscillating weight that winds the mainspring via ceramic ball bearings.', finish: 'Skeletonized & Côtes de Genève', axis: [0, 0, -0.82] },
+      { id: 11, key: 'bridges', name: 'Chamfered Mainplate & Bridges', material: 'Micro-Blasted Grade 5 Titanium', purpose: 'Structural chassis holding all 38 synthetic ruby bearings in micron alignment.', finish: 'Hand-Beveled Anglage Edges', axis: [0, 0, -1.22] },
+      { id: 12, key: 'caseMiddle', name: 'Multi-Piece Case Middle', material: 'Grade 5 Titanium / 18k Gold', purpose: 'Sculpted ergonomic mid-case housing the movement ring and integrated lugs.', finish: 'Linear Brushed Flanks', axis: [0, 0, -1.58] },
+      { id: 13, key: 'caseback', name: 'Exhibition Sapphire Caseback', material: 'Titanium Ring & Sapphire Glass', purpose: 'Hermetically seals the rear of the watch while offering full view of the rotor.', finish: 'Engraved & Anti-Reflective', axis: [0, 0, -2.15] },
+      { id: 14, key: 'crown', name: 'Fluted Screw-Down Crown', material: '18k Gold / Titanium & Viton Seals', purpose: 'Engages winding, date, and hand-setting keyless works with 100m sealing.', finish: '24-Flute Knurled Grip', axis: [1.55, 0, -0.2] },
+      { id: 15, key: 'strap', name: 'Integrated Strap & Folding Clasp', material: 'FKM Rubber / Articulated Metal', purpose: 'Ergonomically contours the wrist with a micro-adjustable deployant buckle.', finish: 'Satin-Brushed Chamfers', axis: [0, -1.15, -0.65] }
+    ];
+
+    const JOURNAL_ARTICLES = [
+      {
+        id: 'art-1',
+        category: 'Horological Engineering',
+        title: 'The Art of Mechanical Precision',
+        readTime: '6 Min Read • Geneva Atelier',
+        excerpt: 'Why a purely mechanical escapement beating at 28,800 vibrations per hour remains the pinnacle of human micro-engineering.',
+        content: [
+          'In an era dominated by digital quartz oscillators and atomic synchronization, haute horlogerie endures precisely because it refuses shortcuts. Inside Caliber AU-01, every fraction of a second is earned through physical conservation of momentum.',
+          'At the heart of the movement lies our free-sprung balance wheel paired with a monocrystalline silicon hairspring. Unlike conventional regulator indexes that alter the active length of the spring, variable-inertia gold weights set directly into the rim allow master watchmakers to poise the oscillator with sub-second daily accuracy.',
+          'Each bridge is milled from Grade 5 titanium before undergoing 40 hours of manual anglage—a process where artisans bevel sharp edges at a 45-degree angle using boxwood sticks and progressively finer diamond pastes until the metal reflects light like a liquid ribbon.'
+        ]
+      },
+      {
+        id: 'art-2',
+        category: 'Architectural Design',
+        title: 'Inside the Skeleton Movement',
+        readTime: '5 Min Read • Caliber AU-01',
+        excerpt: 'Removing every unnecessary gram of metal without compromising structural rigidity or shock resistance.',
+        content: [
+          'True skeletonization is not merely drilling holes into an existing caliber; it is an architectural redesign from a blank sheet. Every bridge must behave like a suspension truss, channeling gear-train torque away from delicate pivot jewels.',
+          'By employing finite-element stress simulation alongside traditional Geneva finishing, AURELION removes nearly 62% of the mainplate mass while increasing torsional stiffness.'
+        ]
+      },
+      {
+        id: 'art-3',
+        category: 'Maison Philosophy',
+        title: 'The Philosophy of Timeless Design',
+        readTime: '4 Min Read • Creative Direction',
+        excerpt: 'How restraint, proportion, and negative space create objects that transcend fleeting trends.',
+        content: [
+          'True luxury never shouts. When designing the AURELION case silhouette, we studied classical architectural proportions alongside aerospace aerodynamics. The result is a 41mm profile with flowing integrated lugs that sits effortlessly beneath a tailored cuff.',
+          'Every chamfer, brushed plane, and polished bezel facet is placed deliberately to create contrast between light and shadow.'
+        ]
+      },
+      {
+        id: 'art-4',
+        category: 'Material Science',
+        title: 'The Science of Sapphire Crystal',
+        readTime: '5 Min Read • Optics & Materials',
+        excerpt: 'Growing, diamond-machining, and optically coating synthetic corundum second only to diamond in hardness.',
+        content: [
+          'Synthesized at over 2,050°C using the Kyropoulos crystal-growth method, our optical-grade sapphire blocks require 90 hours of diamond-wire slicing and CNC grinding to achieve the signature box-domed curvature.',
+          'Seven layers of vacuum-deposited anti-reflective coatings eliminate 99.4% of surface glare, making the crystal appear to vanish over the openworked dial.'
+        ]
+      },
+      {
+        id: 'art-5',
+        category: 'Savoir-Faire',
+        title: 'The Craft of Fine Watchmaking',
+        readTime: '7 Min Read • Master Watchmakers',
+        excerpt: 'One watchmaker, one timepiece: why single-artisan assembly defines the AURELION hallmark.',
+        content: [
+          'Unlike assembly-line production, each AURELION timepiece is assembled twice by a single master watchmaker. The first assembly verifies end-shake tolerances and gear-train meshing; the caliber is then completely dismantled, ultrasonically cleaned, lubricated with five specialized synthetic oils, and reassembled for final chronometric certification.'
+        ]
+      }
+    ];
+
+    const CALIBER_SPECS = {
+      AU01: {
+        subtitle: 'Caliber AU-01 — In-House Automatic Openworked',
+        items: [
+          ['Movement Caliber', 'Caliber AU-01'],
+          ['Movement Type', 'Self-Winding Mechanical'],
+          ['Power Reserve', '72 Hours (Twin Barrels)'],
+          ['Frequency', '28,800 vph (4 Hz)'],
+          ['Jewel Count', '38 Synthetic Rubies'],
+          ['Case Diameter', '41.0 mm'],
+          ['Case Thickness', '9.8 mm'],
+          ['Case Material', 'Grade 5 Titanium / 18k Gold'],
+          ['Crystal Material', 'Box-Domed AR Sapphire'],
+          ['Water Resistance', '100 Meters / 10 ATM'],
+          ['Strap Material', 'FKM Rubber / Integrated Link'],
+          ['Clasp Type', 'Twin-Trigger Deployant']
+        ]
+      },
+      AU09: {
+        subtitle: 'Caliber AU-09 — Column-Wheel Rattrapante Chronograph',
+        items: [
+          ['Movement Caliber', 'Caliber AU-09'],
+          ['Movement Type', 'Automatic Flyback Chrono'],
+          ['Power Reserve', '68 Hours'],
+          ['Frequency', '36,000 vph (5 Hz)'],
+          ['Jewel Count', '44 Synthetic Rubies'],
+          ['Case Diameter', '42.0 mm'],
+          ['Case Thickness', '11.2 mm'],
+          ['Case Material', 'Titanium / Ceramic / Gold'],
+          ['Crystal Material', 'Dual-Domed AR Sapphire'],
+          ['Water Resistance', '150 Meters / 15 ATM'],
+          ['Strap Material', 'FKM Rubber / Metal Bracelet'],
+          ['Clasp Type', 'Micro-Adjust Folding Buckle']
+        ]
+      }
+    };
+
+    /* -----------------------------------------------------------------------
+       2. GLOBAL STATE & CURRENCY FORMATTING
+    ----------------------------------------------------------------------- */
+    let displayCurrency = 'INR';
+    let bag = JSON.parse(localStorage.getItem('aurelion_bag') || '[]');
+    let wishlist = JSON.parse(localStorage.getItem('aurelion_wishlist') || '[]');
+    let activeCollectionFilter = 'ALL';
+    let currentPdpWatch = WATCH_CATALOGUE[0];
+    let currentPdpStrap = { label: 'FKM Vulcanized Rubber', type: 'rubber' };
+
+    function formatPrice(inrAmount) {
+      if (displayCurrency === 'CHF') {
+        const chf = Math.round(inrAmount / 96);
+        return 'CHF ' + chf.toLocaleString('en-CH');
+      }
+      return '₹' + inrAmount.toLocaleString('en-IN');
+    }
+
+    function changeDisplayCurrency(curr) {
+      displayCurrency = curr;
+      renderProductsGrid();
+      updateBespokeUI();
+      updateComparison();
+      renderBagAndWishlist();
+      if (!document.getElementById('product-modal').classList.contains('hidden')) {
+        document.getElementById('pdp-price').textContent = formatPrice(currentPdpWatch.priceINR);
+      }
+      showToast(`Valuation currency updated to ${curr}`);
+    }
+
+    /* -----------------------------------------------------------------------
+       3. PROCEDURAL 3D LUXURY WATCH ENGINE (THREE.JS PBR + 15 COMPONENTS)
+    ----------------------------------------------------------------------- */
+    function createStudioEnvMap() {
+      // Procedural HDR-like studio reflection cubemap via Canvas
+      const size = 128;
+      const faces = [];
+      for (let i = 0; i < 6; i++) {
+        const canvas = document.createElement('canvas');
+        canvas.width = size;
+        canvas.height = size;
+        const ctx = canvas.getContext('2d');
+        const grad = ctx.createLinearGradient(0, 0, size, size);
+        if (i === 2) {
+          // Top warm studio softbox
+          grad.addColorStop(0, '#FFF6E5');
+          grad.addColorStop(0.5, '#C5A46D');
+          grad.addColorStop(1, '#1A1C1E');
+        } else if (i === 3) {
+          grad.addColorStop(0, '#080909');
+          grad.addColorStop(1, '#141515');
+        } else {
+          grad.addColorStop(0, '#2B2E33');
+          grad.addColorStop(0.35, '#EAE5DB');
+          grad.addColorStop(0.5, '#0F1113');
+          grad.addColorStop(0.85, '#C5A46D');
+          grad.addColorStop(1, '#080909');
+        }
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, size, size);
+        faces.push(canvas);
+      }
+      const cubeTex = new THREE.CubeTexture(faces);
+      cubeTex.needsUpdate = true;
+      return cubeTex;
+    }
+
+    const SHARED_ENV_MAP = createStudioEnvMap();
+
+    const MATERIAL_PRESETS = {
+      gold: { color: 0xC5A46D, metalness: 0.94, roughness: 0.22 },
+      titanium: { color: 0xB8B9B6, metalness: 0.88, roughness: 0.32 },
+      platinum: { color: 0xE6E8EC, metalness: 0.96, roughness: 0.16 },
+      ceramic: { color: 0x1A1C1E, metalness: 0.45, roughness: 0.28 }
+    };
+
+    const DIAL_PRESETS = {
+      skeleton: { opacity: 0.18, color: 0x141515 },
+      obsidian: { opacity: 0.96, color: 0x0B0C0E },
+      midnight: { opacity: 0.96, color: 0x10223A },
+      ivory: { opacity: 0.96, color: 0xEAE5DB }
+    };
+
+    /**
+     * Builds a modular 15-component 3D mechanical watch assembly
+     */
+    function buildWatchModel(options = {}) {
+      const cfg = {
+        caseType: options.caseType || 'gold',
+        dialType: options.dialType || 'skeleton',
+        strapType: options.strapType || 'rubber',
+        handsType: options.handsType || 'gold',
+        finishType: options.finishType || 'brushed'
+      };
+
+      const root = new THREE.Group();
+      const parts = {};
+      const clickableMeshes = [];
+
+      const casePreset = MATERIAL_PRESETS[cfg.caseType] || MATERIAL_PRESETS.gold;
+      const roughnessOffset = cfg.finishType === 'polished' ? -0.1 : (cfg.finishType === 'satin' ? 0.12 : 0);
+
+      const caseMat = new THREE.MeshStandardMaterial({
+        color: casePreset.color,
+        metalness: casePreset.metalness,
+        roughness: Math.max(0.08, Math.min(0.65, casePreset.roughness + roughnessOffset)),
+        envMap: SHARED_ENV_MAP,
+        envMapIntensity: 1.4
+      });
+
+      const goldAccentMat = new THREE.MeshStandardMaterial({
+        color: 0xC5A46D,
+        metalness: 0.95,
+        roughness: 0.2,
+        envMap: SHARED_ENV_MAP,
+        envMapIntensity: 1.5
+      });
+
+      const steelMat = new THREE.MeshStandardMaterial({
+        color: 0xB8B9B6,
+        metalness: 0.9,
+        roughness: 0.25,
+        envMap: SHARED_ENV_MAP,
+        envMapIntensity: 1.3
+      });
+
+      const darkBridgeMat = new THREE.MeshStandardMaterial({
+        color: 0x26292E,
+        metalness: 0.82,
+        roughness: 0.36,
+        envMap: SHARED_ENV_MAP,
+        envMapIntensity: 1.1
+      });
+
+      const rubyMat = new THREE.MeshStandardMaterial({
+        color: 0xB81D4A,
+        metalness: 0.1,
+        roughness: 0.15,
+        emissive: 0x3A0514,
+        emissiveIntensity: 0.4
+      });
+
+      const registerPart = (key, group) => {
+        group.userData.partKey = key;
+        parts[key] = group;
+        group.traverse(child => {
+          if (child.isMesh) {
+            child.userData.partKey = key;
+            clickableMeshes.push(child);
+          }
+        });
+        root.add(group);
+      };
+
+      // 1. Domed Sapphire Crystal
+      const crystalGroup = new THREE.Group();
+      const crystalGeo = new THREE.CylinderGeometry(1.18, 1.2, 0.05, 48);
+      crystalGeo.rotateX(Math.PI / 2);
+      const crystalMat = new THREE.MeshPhysicalMaterial({
+        color: 0xFFFFFF,
+        transparent: true,
+        opacity: 0.22,
+        roughness: 0.05,
+        metalness: 0.05,
+        reflectivity: 0.95,
+        envMap: SHARED_ENV_MAP,
+        envMapIntensity: 1.8
+      });
+      const crystalMesh = new THREE.Mesh(crystalGeo, crystalMat);
+      crystalMesh.position.z = 0.24;
+      crystalGroup.add(crystalMesh);
+      registerPart('crystal', crystalGroup);
+
+      // 2. Architectural Bezel (Octagonal-Round luxury silhouette)
+      const bezelGroup = new THREE.Group();
+      const bezelGeo = new THREE.TorusGeometry(1.24, 0.11, 20, 48);
+      const bezelMesh = new THREE.Mesh(bezelGeo, caseMat);
+      bezelMesh.position.z = 0.18;
+      bezelGroup.add(bezelMesh);
+      // 8 bezel screws
+      for (let i = 0; i < 8; i++) {
+        const ang = (i / 8) * Math.PI * 2 + Math.PI / 8;
+        const screw = new THREE.Mesh(new THREE.CylinderGeometry(0.026, 0.026, 0.04, 12), steelMat);
+        screw.rotation.x = Math.PI / 2;
+        screw.position.set(Math.cos(ang) * 1.24, Math.sin(ang) * 1.24, 0.27);
+        bezelGroup.add(screw);
+      }
+      registerPart('bezel', bezelGroup);
+
+      // 3. Dauphine Skeleton Hands (Hour, Minute, Sweeping Second)
+      const handsGroup = new THREE.Group();
+      const handColor = cfg.handsType === 'gold' ? 0xC5A46D : (cfg.handsType === 'black' ? 0x18191B : 0xEAE5DB);
+      const handMat = new THREE.MeshStandardMaterial({ color: handColor, metalness: 0.95, roughness: 0.18, envMap: SHARED_ENV_MAP });
+
+      const hourHand = new THREE.Mesh(new THREE.BoxGeometry(0.055, 0.58, 0.015), handMat);
+      hourHand.position.set(0, 0.22, 0.14);
+      const hourPivot = new THREE.Group();
+      hourPivot.add(hourHand);
+      hourPivot.rotation.z = -0.85;
+
+      const minHand = new THREE.Mesh(new THREE.BoxGeometry(0.038, 0.88, 0.015), handMat);
+      minHand.position.set(0, 0.36, 0.16);
+      const minPivot = new THREE.Group();
+      minPivot.add(minHand);
+      minPivot.rotation.z = 0.65;
+
+      const secHand = new THREE.Mesh(new THREE.BoxGeometry(0.014, 1.02, 0.012), goldAccentMat);
+      secHand.position.set(0, 0.38, 0.18);
+      const secPivot = new THREE.Group();
+      secPivot.add(secHand);
+
+      const centerCap = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.05, 20), handMat);
+      centerCap.rotation.x = Math.PI / 2;
+      centerCap.position.z = 0.17;
+
+      handsGroup.add(hourPivot, minPivot, secPivot, centerCap);
+      registerPart('hands', handsGroup);
+
+      // 4. Openworked Chapter Ring & Dial Plate
+      const dialGroup = new THREE.Group();
+      const chapterRing = new THREE.Mesh(new THREE.RingGeometry(0.95, 1.16, 64), darkBridgeMat);
+      chapterRing.position.z = 0.11;
+      const dialPreset = DIAL_PRESETS[cfg.dialType] || DIAL_PRESETS.skeleton;
+      const dialPlateMat = new THREE.MeshStandardMaterial({
+        color: dialPreset.color,
+        metalness: 0.5,
+        roughness: 0.35,
+        transparent: true,
+        opacity: dialPreset.opacity,
+        envMap: SHARED_ENV_MAP
+      });
+      const dialPlate = new THREE.Mesh(new THREE.CircleGeometry(0.96, 48), dialPlateMat);
+      dialPlate.position.z = 0.08;
+      dialGroup.add(chapterRing, dialPlate);
+      registerPart('dial', dialGroup);
+
+      // 5. Applied Baton Hour Markers
+      const markersGroup = new THREE.Group();
+      for (let i = 0; i < 12; i++) {
+        const ang = (i / 12) * Math.PI * 2;
+        const isCardinal = i % 3 === 0;
+        const marker = new THREE.Mesh(
+          new THREE.BoxGeometry(isCardinal ? 0.048 : 0.028, isCardinal ? 0.16 : 0.12, 0.025),
+          goldAccentMat
+        );
+        marker.position.set(Math.sin(ang) * 0.98, Math.cos(ang) * 0.98, 0.125);
+        marker.rotation.z = -ang;
+        markersGroup.add(marker);
+      }
+      registerPart('markers', markersGroup);
+
+      // Helper to build a spoked horological gear
+      const makeGear = (radius, teeth, thickness, mat) => {
+        const g = new THREE.Group();
+        const rim = new THREE.Mesh(new THREE.RingGeometry(radius * 0.72, radius, 32), mat);
+        const hub = new THREE.Mesh(new THREE.CircleGeometry(radius * 0.24, 20), mat);
+        g.add(rim, hub);
+        for (let s = 0; s < 5; s++) {
+          const sa = (s / 5) * Math.PI * 2;
+          const spoke = new THREE.Mesh(new THREE.BoxGeometry(radius * 0.65, radius * 0.09, thickness), mat);
+          spoke.position.set(Math.cos(sa) * radius * 0.44, Math.sin(sa) * radius * 0.44, 0);
+          spoke.rotation.z = sa;
+          g.add(spoke);
+        }
+        for (let t = 0; t < teeth; t++) {
+          const ta = (t / teeth) * Math.PI * 2;
+          const tooth = new THREE.Mesh(new THREE.BoxGeometry(0.025, 0.022, thickness), mat);
+          tooth.position.set(Math.cos(ta) * (radius + 0.012), Math.sin(ta) * (radius + 0.012), 0);
+          tooth.rotation.z = ta;
+          g.add(tooth);
+        }
+        const jewel = new THREE.Mesh(new THREE.CylinderGeometry(0.024, 0.024, thickness * 1.6, 12), rubyMat);
+        jewel.rotation.x = Math.PI / 2;
+        g.add(jewel);
+        return g;
+      };
+
+      // 6. Primary Gear Train
+      const gearsGroup = new THREE.Group();
+      const centerWheel = makeGear(0.34, 28, 0.02, goldAccentMat);
+      centerWheel.position.set(0, 0, 0.03);
+      const thirdWheel = makeGear(0.24, 22, 0.02, steelMat);
+      thirdWheel.position.set(0.36, 0.24, 0.02);
+      const fourthWheel = makeGear(0.21, 20, 0.02, goldAccentMat);
+      fourthWheel.position.set(-0.34, -0.22, 0.02);
+      gearsGroup.add(centerWheel, thirdWheel, fourthWheel);
+      registerPart('gears', gearsGroup);
+
+      // 7. Free-Sprung Balance Wheel & Hairspring
+      const balanceGroup = new THREE.Group();
+      const balanceWheel = makeGear(0.26, 16, 0.022, goldAccentMat);
+      const hairspring = new THREE.Mesh(new THREE.TorusGeometry(0.11, 0.008, 8, 32), steelMat);
+      hairspring.position.z = 0.015;
+      balanceWheel.add(hairspring);
+      balanceWheel.position.set(0.32, -0.34, 0.04);
+      balanceGroup.add(balanceWheel);
+      registerPart('balance', balanceGroup);
+
+      // 8. Swiss Lever Escapement Mechanism
+      const escapementGroup = new THREE.Group();
+      const escapeWheel = makeGear(0.15, 15, 0.018, steelMat);
+      escapeWheel.position.set(-0.04, -0.44, 0.02);
+      const palletFork = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.022, 0.018), steelMat);
+      palletFork.position.set(0.12, -0.4, 0.025);
+      palletFork.rotation.z = 0.35;
+      escapementGroup.add(escapeWheel, palletFork);
+      registerPart('escapement', escapementGroup);
+
+      // 9. Twin Mainspring Barrel
+      const barrelGroup = new THREE.Group();
+      const barrel1 = new THREE.Mesh(new THREE.CylinderGeometry(0.28, 0.28, 0.05, 32), steelMat);
+      barrel1.rotation.x = Math.PI / 2;
+      barrel1.position.set(-0.28, 0.34, -0.01);
+      const barrelCap = makeGear(0.27, 24, 0.015, goldAccentMat);
+      barrelCap.position.set(-0.28, 0.34, 0.02);
+      barrelGroup.add(barrel1, barrelCap);
+      registerPart('barrel', barrelGroup);
+
+      // 10. 22k Gold Automatic Rotor
+      const rotorGroup = new THREE.Group();
+      const rotorPivot = new THREE.Group();
+      const rotorArc = new THREE.Mesh(new THREE.CylinderGeometry(0.95, 0.95, 0.03, 36, 1, false, 0, Math.PI), goldAccentMat);
+      rotorArc.rotation.x = Math.PI / 2;
+      rotorArc.position.z = -0.14;
+      const rotorWeight = new THREE.Mesh(new THREE.TorusGeometry(0.92, 0.045, 12, 32, Math.PI), goldAccentMat);
+      rotorWeight.position.z = -0.14;
+      rotorPivot.add(rotorArc, rotorWeight);
+      rotorPivot.rotation.z = 0.7;
+      rotorGroup.add(rotorPivot);
+      registerPart('rotor', rotorGroup);
+
+      // 11. Chamfered Mainplate & Bridges
+      const bridgesGroup = new THREE.Group();
+      const mainplate = new THREE.Mesh(new THREE.RingGeometry(0.32, 1.08, 48), darkBridgeMat);
+      mainplate.position.z = -0.04;
+      const upperBridge = new THREE.Mesh(new THREE.BoxGeometry(1.45, 0.16, 0.035), darkBridgeMat);
+      upperBridge.position.set(0, 0.18, -0.02);
+      upperBridge.rotation.z = -0.25;
+      const lowerBridge = new THREE.Mesh(new THREE.BoxGeometry(1.3, 0.14, 0.035), darkBridgeMat);
+      lowerBridge.position.set(0, -0.26, -0.02);
+      lowerBridge.rotation.z = 0.2;
+      bridgesGroup.add(mainplate, upperBridge, lowerBridge);
+      registerPart('bridges', bridgesGroup);
+
+      // 12. Multi-Piece Architectural Case Middle & Lugs
+      const caseGroup = new THREE.Group();
+      const caseWall = new THREE.Mesh(new THREE.CylinderGeometry(1.32, 1.32, 0.34, 48, 1, true), caseMat);
+      caseWall.rotation.x = Math.PI / 2;
+      const caseInner = new THREE.Mesh(new THREE.TorusGeometry(1.28, 0.08, 16, 48), caseMat);
+      caseGroup.add(caseWall, caseInner);
+
+      // 4 Sculpted Integrated Lugs
+      const lugPositions = [
+        [-0.68, 1.34, 0], [0.68, 1.34, 0],
+        [-0.68, -1.34, 0], [0.68, -1.34, 0]
+      ];
+      lugPositions.forEach(([lx, ly, lz]) => {
+        const lug = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.44, 0.24), caseMat);
+        lug.position.set(lx, ly, lz);
+        caseGroup.add(lug);
+      });
+      registerPart('caseMiddle', caseGroup);
+
+      // 13. Exhibition Sapphire Caseback
+      const casebackGroup = new THREE.Group();
+      const cbRing = new THREE.Mesh(new THREE.TorusGeometry(1.22, 0.09, 16, 48), caseMat);
+      cbRing.position.z = -0.18;
+      const cbGlass = new THREE.Mesh(new THREE.CircleGeometry(1.14, 40), crystalMat);
+      cbGlass.position.z = -0.19;
+      casebackGroup.add(cbRing, cbGlass);
+      registerPart('caseback', casebackGroup);
+
+      // 14. Fluted Screw-Down Crown & Stem
+      const crownGroup = new THREE.Group();
+      const crownBody = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.16, 0.18, 24), caseMat);
+      crownBody.rotation.z = Math.PI / 2;
+      crownBody.position.set(1.42, 0, 0);
+      const crownGuards = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.56, 0.22), caseMat);
+      crownGuards.position.set(1.32, 0, 0);
+      crownGroup.add(crownBody, crownGuards);
+      registerPart('crown', crownGroup);
+
+      // 15. Integrated Strap / Articulated Bracelet
+      const strapGroup = new THREE.Group();
+      const strapMat = cfg.strapType === 'bracelet'
+        ? caseMat
+        : new THREE.MeshStandardMaterial({ color: 0x161719, roughness: 0.72, metalness: 0.15 });
+
+      for (let side of [-1, 1]) {
+        for (let seg = 0; seg < 6; seg++) {
+          const link = new THREE.Mesh(
+            new THREE.BoxGeometry(0.98 - seg * 0.04, 0.24, 0.09),
+            strapMat
+          );
+          const angle = side * (0.28 + seg * 0.22);
+          const yPos = side * (1.58 + Math.sin(seg * 0.26) * 1.15);
+          const zPos = -0.12 - (1 - Math.cos(seg * 0.26)) * 1.15;
+          link.position.set(0, yPos, zPos);
+          link.rotation.x = angle;
+          strapGroup.add(link);
+        }
+      }
+      registerPart('strap', strapGroup);
+
+      // Animation ticker for live horological motion
+      const updateAnimation = (elapsed) => {
+        // 4 Hz ticking balance wheel (8 ticks/sec)
+        balanceWheel.rotation.z = Math.sin(elapsed * Math.PI * 8) * 0.65;
+        escapeWheel.rotation.z = -elapsed * 1.8;
+        centerWheel.rotation.z = -elapsed * 0.15;
+        thirdWheel.rotation.z = elapsed * 0.45;
+        fourthWheel.rotation.z = -elapsed * 0.9;
+        // Sweeping second hand (8 beats per second)
+        const steppedTime = Math.floor(elapsed * 8) / 8;
+        secPivot.rotation.z = -(steppedTime / 60) * Math.PI * 2;
+        // Subtle rotor oscillation
+        rotorPivot.rotation.z = 0.7 + Math.sin(elapsed * 0.7) * 0.25;
+      };
+
+      const setMaterials = (newOpts) => {
+        if (newOpts.caseType && MATERIAL_PRESETS[newOpts.caseType]) {
+          const p = MATERIAL_PRESETS[newOpts.caseType];
+          caseMat.color.setHex(p.color);
+          caseMat.metalness = p.metalness;
+          caseMat.roughness = p.roughness;
+          if (cfg.strapType === 'bracelet') strapMat.color.setHex(p.color);
+        }
+        if (newOpts.dialType && DIAL_PRESETS[newOpts.dialType]) {
+          const d = DIAL_PRESETS[newOpts.dialType];
+          dialPlateMat.color.setHex(d.color);
+          dialPlateMat.opacity = d.opacity;
+        }
+        if (newOpts.strapType) {
+          cfg.strapType = newOpts.strapType;
+          if (newOpts.strapType === 'bracelet') {
+            strapMat.color.copy(caseMat.color);
+            strapMat.metalness = caseMat.metalness;
+            strapMat.roughness = caseMat.roughness;
+          } else {
+            strapMat.color.setHex(0x161719);
+            strapMat.metalness = 0.15;
+            strapMat.roughness = 0.72;
+          }
+        }
+        if (newOpts.handsType) {
+          const hc = newOpts.handsType === 'gold' ? 0xC5A46D : (newOpts.handsType === 'black' ? 0x18191B : 0xEAE5DB);
+          handMat.color.setHex(hc);
+        }
+        if (newOpts.finishType) {
+          const baseR = (MATERIAL_PRESETS[newOpts.caseType || cfg.caseType] || MATERIAL_PRESETS.gold).roughness;
+          const off = newOpts.finishType === 'polished' ? -0.1 : (newOpts.finishType === 'satin' ? 0.12 : 0);
+          caseMat.roughness = Math.max(0.08, Math.min(0.65, baseR + off));
+        }
+      };
+
+      const setExplosionAmount = (factor) => {
+        WATCH_COMPONENTS_15.forEach(comp => {
+          const grp = parts[comp.key];
+          if (grp) {
+            grp.position.set(
+              comp.axis[0] * factor * 1.15,
+              comp.axis[1] * factor * 1.15,
+              comp.axis[2] * factor * 1.15
+            );
+          }
+        });
+      };
+
+      const highlightPart = (partKey) => {
+        Object.entries(parts).forEach(([k, grp]) => {
+          grp.traverse(child => {
+            if (child.isMesh && child.material && child.material.emissive) {
+              if (k === partKey) {
+                child.material.emissive.setHex(0xC5A46D);
+                child.material.emissiveIntensity = 0.28;
+              } else {
+                child.material.emissive.setHex(0x000000);
+                child.material.emissiveIntensity = 0;
+              }
+            }
+          });
+        });
+      };
+
+      return { root, parts, clickableMeshes, updateAnimation, setMaterials, setExplosionAmount, highlightPart };
+    }
+
+    /**
+     * Reusable WebGL Viewport Controller with graceful fallback
+     */
+    function createViewport(containerId, watchOptions, config = {}) {
+      const container = document.getElementById(containerId);
+      if (!container) return null;
+
+      let renderer;
+      try {
+        renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
+      } catch (e) {
+        container.innerHTML = `<div class="w-full h-full flex items-center justify-center p-6 text-center text-xs text-titanium">3D WebGL Acceleration Unavailable on this Device.</div>`;
+        return null;
+      }
+
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      renderer.setSize(container.clientWidth || 400, container.clientHeight || 400);
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 1.25;
+      container.appendChild(renderer.domElement);
+
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(
+        config.fov || 36,
+        (container.clientWidth || 400) / (container.clientHeight || 400),
+        0.1,
+        100
+      );
+      camera.position.set(...(config.camPos || [0.6, 0.35, 5.2]));
+
+      // Architectural Lighting Rig
+      const ambient = new THREE.AmbientLight(0xEAE5DB, 0.55);
+      const keyLight = new THREE.DirectionalLight(0xFFE7C2, 2.1);
+      keyLight.position.set(4, 6, 5);
+      const rimLight = new THREE.DirectionalLight(0xC5A46D, 1.4);
+      rimLight.position.set(-5, -3, -4);
+      const fillLight = new THREE.PointLight(0xB8B9B6, 0.9, 15);
+      fillLight.position.set(-3, 4, 4);
+      scene.add(ambient, keyLight, rimLight, fillLight);
+
+      // Optional Subtle Floating Dust Motes (Hero)
+      let particles = null;
+      if (config.particles) {
+        const pCount = 90;
+        const pGeo = new THREE.BufferGeometry();
+        const pos = new Float32Array(pCount * 3);
+        for (let i = 0; i < pCount * 3; i++) pos[i] = (Math.random() - 0.5) * 9;
+        pGeo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+        const pMat = new THREE.PointsMaterial({ color: 0xC5A46D, size: 0.022, transparent: true, opacity: 0.45 });
+        particles = new THREE.Points(pGeo, pMat);
+        scene.add(particles);
+      }
+
+      const watch = buildWatchModel(watchOptions);
+      watch.root.rotation.set(-0.18, 0.28, -0.12);
+      scene.add(watch.root);
+
+      const controls = new THREE.OrbitControls(camera, renderer.domElement);
+      controls.enableDamping = true;
+      controls.dampingFactor = 0.06;
+      controls.enablePan = false;
+      controls.minDistance = 2.6;
+      controls.maxDistance = 8.5;
+      controls.autoRotate = config.autoRotate !== undefined ? config.autoRotate : true;
+      controls.autoRotateSpeed = config.autoRotateSpeed || 0.9;
+
+      // Resize observer
+      const resizeObserver = new ResizeObserver(() => {
+        if (!container.clientWidth || !container.clientHeight) return;
+        camera.aspect = container.clientWidth / container.clientHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(container.clientWidth, container.clientHeight);
+      });
+      resizeObserver.observe(container);
+
+      return {
+        container, renderer, scene, camera, controls, watch,
+        lights: { ambient, keyLight, rimLight, fillLight },
+        particles,
+        targetCamPos: null
+      };
+    }
+
+    /* -----------------------------------------------------------------------
+       4. INITIALIZE ALL 3D SCENES (HERO, STUDIO, BESPOKE, COMPARE A/B, PDP)
+    ----------------------------------------------------------------------- */
+    let heroVP, studioVP, bespokeVP, compareVPA, compareVPB, pdpVP;
+    let currentExplosion = 0;
+    let targetExplosion = 0;
+    let selectedComponentKey = 'balance';
+    let pdpExploded = false;
+
+    function initAll3DViewports() {
+      heroVP = createViewport('hero-canvas-container', { caseType: 'gold', dialType: 'skeleton', strapType: 'rubber', handsType: 'gold' }, {
+        camPos: [0.4, 0.25, 5.1],
+        autoRotate: true,
+        autoRotateSpeed: 0.75,
+        particles: true
+      });
+
+      studioVP = createViewport('studio-canvas-container', { caseType: 'gold', dialType: 'skeleton', strapType: 'rubber', handsType: 'gold' }, {
+        camPos: [0.85, 0.35, 5.2],
+        autoRotate: true,
+        autoRotateSpeed: 0.65
+      });
+
+      bespokeVP = createViewport('bespoke-canvas-container', { caseType: 'titanium', dialType: 'skeleton', strapType: 'rubber', handsType: 'gold' }, {
+        camPos: [0.55, 0.3, 4.9],
+        autoRotate: true,
+        autoRotateSpeed: 0.85
+      });
+
+      compareVPA = createViewport('compare-canvas-a', WATCH_CATALOGUE[0], { camPos: [0.4, 0.25, 5.0], autoRotate: true, autoRotateSpeed: 0.7 });
+      compareVPB = createViewport('compare-canvas-b', WATCH_CATALOGUE[2], { camPos: [-0.4, 0.25, 5.0], autoRotate: true, autoRotateSpeed: 0.7 });
+
+      // Raycasting on Studio 3D Viewport to select any of the 15 components
+      if (studioVP) {
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+        let downX = 0, downY = 0;
+
+        studioVP.renderer.domElement.addEventListener('pointerdown', (e) => {
+          downX = e.clientX;
+          downY = e.clientY;
+        });
+
+        studioVP.renderer.domElement.addEventListener('pointerup', (e) => {
+          if (Math.hypot(e.clientX - downX, e.clientY - downY) > 6) return;
+          const rect = studioVP.renderer.domElement.getBoundingClientRect();
+          mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+          mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+          raycaster.setFromCamera(mouse, studioVP.camera);
+          const hits = raycaster.intersectObjects(studioVP.watch.clickableMeshes, false);
+          if (hits.length > 0 && hits[0].object.userData.partKey) {
+            selectMechanicalComponent(hits[0].object.userData.partKey);
+          }
+        });
+      }
+    }
+
+    // Master Animation Loop
+    const clock = new THREE.Clock();
+    function animateMasterLoop() {
+      requestAnimationFrame(animateMasterLoop);
+      const elapsed = clock.getElapsedTime();
+
+      // Smoothly interpolate explosion state
+      currentExplosion += (targetExplosion - currentExplosion) * 0.08;
+      if (studioVP) {
+        studioVP.watch.setExplosionAmount(currentExplosion);
+        const pct = Math.round(currentExplosion * 100);
+        document.getElementById('explosion-slider').value = pct;
+        document.getElementById('explosion-percent-label').textContent =
+          pct === 0 ? '0% ASSEMBLED' : (pct === 100 ? '100% FULL EXPLODED' : `${pct}% SEPARATED`);
+      }
+
+      const activeViewports = [heroVP, studioVP, bespokeVP, compareVPA, compareVPB, pdpVP];
+      activeViewports.forEach(vp => {
+        if (!vp || vp.container.offsetParent === null) return;
+        vp.watch.updateAnimation(elapsed);
+        if (vp.particles) vp.particles.rotation.y = elapsed * 0.04;
+        if (vp.targetCamPos) {
+          vp.camera.position.lerp(vp.targetCamPos, 0.08);
+          if (vp.camera.position.distanceTo(vp.targetCamPos) < 0.03) vp.targetCamPos = null;
+        }
+        vp.controls.update();
+        vp.renderer.render(vp.scene, vp.camera);
+      });
+    }
+
+    /* -----------------------------------------------------------------------
+       5. STUDIO VIEWPORT & 15-COMPONENT EXPLODED CONTROLS
+    ----------------------------------------------------------------------- */
+    function setExplosionTarget(val) {
+      targetExplosion = val;
+      if (studioVP && val > 0.5) {
+        studioVP.targetCamPos = new THREE.Vector3(3.6, 1.4, 4.4);
+        studioVP.controls.autoRotate = false;
+        document.getElementById('autorotate-indicator').textContent = 'OFF';
+      }
+    }
+
+    function onExplosionSliderInput(val) {
+      targetExplosion = Number(val) / 100;
+      currentExplosion = targetExplosion;
+    }
+
+    function triggerExplodeFromHero() {
+      setTimeout(() => setExplosionTarget(1), 500);
+    }
+
+    function setCameraPreset(preset) {
+      if (!studioVP) return;
+      document.querySelectorAll('.cam-preset-btn').forEach(b => {
+        b.classList.toggle('border-champagne/40', b.dataset.preset === preset);
+        b.classList.toggle('text-ivory', b.dataset.preset === preset);
+      });
+      const map = {
+        front: new THREE.Vector3(0, 0, 5.0),
+        side: new THREE.Vector3(5.0, 0.1, 0.2),
+        back: new THREE.Vector3(0, 0, -5.0),
+        movement: new THREE.Vector3(0.4, -0.35, 3.1)
+      };
+      if (map[preset]) studioVP.targetCamPos = map[preset];
+    }
+
+    function resetMainCamera() {
+      if (!studioVP) return;
+      studioVP.targetCamPos = new THREE.Vector3(0.85, 0.35, 5.2);
+      studioVP.controls.target.set(0, 0, 0);
+    }
+
+    function zoomMainCamera(delta) {
+      if (!studioVP) return;
+      const dir = studioVP.camera.position.clone().normalize();
+      const nextDist = Math.max(2.7, Math.min(8.2, studioVP.camera.position.length() + delta));
+      studioVP.targetCamPos = dir.multiplyScalar(nextDist);
+    }
+
+    function toggleAutoRotate() {
+      if (!studioVP) return;
+      studioVP.controls.autoRotate = !studioVP.controls.autoRotate;
+      document.getElementById('autorotate-indicator').textContent = studioVP.controls.autoRotate ? 'ON' : 'OFF';
+    }
+
+    function setStudioLighting(mode) {
+      if (!studioVP) return;
+      document.querySelectorAll('.light-btn').forEach(b => {
+        const active = b.dataset.light === mode;
+        b.classList.toggle('border-champagne', active);
+        b.classList.toggle('text-ivory', active);
+      });
+      if (mode === 'gold') {
+        studioVP.lights.keyLight.color.setHex(0xFFE7C2);
+        studioVP.lights.keyLight.intensity = 2.1;
+        studioVP.lights.rimLight.color.setHex(0xC5A46D);
+      } else if (mode === 'noir') {
+        studioVP.lights.keyLight.color.setHex(0xD8DEE9);
+        studioVP.lights.keyLight.intensity = 1.4;
+        studioVP.lights.rimLight.color.setHex(0x4C566A);
+      } else {
+        studioVP.lights.keyLight.color.setHex(0xFFFFFF);
+        studioVP.lights.keyLight.intensity = 2.3;
+        studioVP.lights.rimLight.color.setHex(0x88C0D0);
+      }
+    }
+
+    function applyWatchMaterial(caseType) {
+      if (studioVP) studioVP.watch.setMaterials({ caseType });
+    }
+    function applyWatchDial(dialType) {
+      if (studioVP) studioVP.watch.setMaterials({ dialType });
+    }
+    function applyWatchStrap(strapType) {
+      if (studioVP) studioVP.watch.setMaterials({ strapType });
+    }
+
+    function renderComponentList() {
+      const container = document.getElementById('component-list');
+      container.innerHTML = WATCH_COMPONENTS_15.map(comp => `
+        <button onclick="selectMechanicalComponent('${comp.key}')" data-comp-key="${comp.key}"
+          class="comp-item-btn w-full text-left px-3 py-2 flex items-center justify-between border transition-colors ${comp.key === selectedComponentKey ? 'bg-charcoal border-champagne text-ivory' : 'bg-charcoal/40 border-ivory/10 text-titanium hover:text-ivory'}">
+          <span class="truncate"><span class="font-mono text-[10px] text-champagne mr-2">${String(comp.id).padStart(2, '0')}</span>${comp.name}</span>
+          <span class="text-[10px] text-champagne">&rsaquo;</span>
+        </button>
+      `).join('');
+    }
+
+    function selectMechanicalComponent(key) {
+      selectedComponentKey = key;
+      const comp = WATCH_COMPONENTS_15.find(c => c.key === key);
+      if (!comp) return;
+
+      document.getElementById('inspector-index').textContent = `Component ${String(comp.id).padStart(2, '0')} / 15`;
+      document.getElementById('inspector-title').textContent = comp.name;
+      document.getElementById('inspector-material').textContent = `Material: ${comp.material}`;
+      document.getElementById('inspector-purpose').textContent = comp.purpose;
+      document.getElementById('inspector-finish').textContent = comp.finish;
+
+      // Floating badge feedback
+      const badge = document.getElementById('floating-part-badge');
+      document.getElementById('floating-part-num').textContent = `PART ${String(comp.id).padStart(2, '0')} / 15`;
+      document.getElementById('floating-part-name').textContent = comp.name;
+      badge.classList.remove('opacity-0');
+      clearTimeout(window._badgeTimer);
+      window._badgeTimer = setTimeout(() => badge.classList.add('opacity-0'), 2200);
+
+      if (studioVP) studioVP.watch.highlightPart(key);
+      renderComponentList();
+    }
+
+    /* -----------------------------------------------------------------------
+       6. COLLECTION GALLERY & PRODUCT DETAIL MODAL (PDP)
+    ----------------------------------------------------------------------- */
+    function renderWatchArtSVG(watch) {
+      const bezelColor = watch.caseType === 'gold' ? '#C5A46D' : (watch.caseType === 'platinum' ? '#E5E7EB' : (watch.caseType === 'titanium' ? '#B8B9B6' : '#343638'));
+      const dialFill = watch.dialType === 'ivory' ? '#EAE5DB' : (watch.dialType === 'midnight' ? '#10223A' : '#0D0E10');
+      const isSkeleton = watch.dialType === 'skeleton';
+      return `
+        <svg class="w-44 h-44 mx-auto transition-transform duration-700 group-hover:scale-105" viewBox="0 0 200 200" fill="none">
+          <!-- Integrated Strap -->
+          <rect x="74" y="8" width="52" height="36" fill="#1C1E21" stroke="${bezelColor}" stroke-opacity="0.35"/>
+          <rect x="74" y="156" width="52" height="36" fill="#1C1E21" stroke="${bezelColor}" stroke-opacity="0.35"/>
+          <!-- Case & Lugs -->
+          <rect x="62" y="34" width="76" height="132" rx="10" fill="#141515" stroke="${bezelColor}" stroke-width="1.5"/>
+          <circle cx="100" cy="100" r="62" fill="${dialFill}" stroke="${bezelColor}" stroke-width="5"/>
+          <circle cx="100" cy="100" r="54" stroke="${bezelColor}" stroke-opacity="0.45" stroke-width="0.8"/>
+          ${isSkeleton ? `
+            <circle cx="100" cy="100" r="32" stroke="#C5A46D" stroke-opacity="0.6" stroke-width="1" stroke-dasharray="4 3"/>
+            <circle cx="84" cy="84" r="14" stroke="#B8B9B6" stroke-opacity="0.5" stroke-width="1"/>
+            <circle cx="116" cy="116" r="12" stroke="#C5A46D" stroke-opacity="0.7" stroke-width="1.2"/>
+            <line x1="65" y1="100" x2="135" y2="100" stroke="#343638" stroke-width="3"/>
+          ` : ''}
+          <!-- Baton Hour Markers -->
+          <line x1="100" y1="48" x2="100" y2="57" stroke="${bezelColor}" stroke-width="2"/>
+          <line x1="100" y1="143" x2="100" y2="152" stroke="${bezelColor}" stroke-width="2"/>
+          <line x1="48" y1="100" x2="57" y2="100" stroke="${bezelColor}" stroke-width="2"/>
+          <line x1="143" y1="100" x2="152" y2="100" stroke="${bezelColor}" stroke-width="2"/>
+          <!-- Hands -->
+          <line x1="100" y1="100" x2="78" y2="78" stroke="${bezelColor}" stroke-width="2.6" stroke-linecap="round"/>
+          <line x1="100" y1="100" x2="130" y2="72" stroke="${bezelColor}" stroke-width="2" stroke-linecap="round"/>
+          <circle cx="100" cy="100" r="3.5" fill="#C5A46D"/>
+          <!-- Crown -->
+          <rect x="162" y="92" width="7" height="16" rx="1.5" fill="${bezelColor}"/>
+        </svg>
+      `;
+    }
+
+    function filterCollection(col) {
+      activeCollectionFilter = col;
+      document.querySelectorAll('.col-filter-btn').forEach(btn => {
+        const active = btn.dataset.col === col;
+        btn.className = `col-filter-btn px-4 py-2.5 text-[10px] tracking-editorial uppercase transition-colors ${active ? 'bg-champagne text-obsidian font-semibold' : 'bg-charcoal border border-ivory/15 text-titanium hover:text-ivory'}`;
+      });
+
+      const descriptions = {
+        'ALL': ['Complete Maison Catalogue', 'Eight individually numbered mechanical references crafted in limited annual allocations.'],
+        'AURELION NOIR': ['AURELION NOIR', 'Stealth Grade 5 black titanium and ceramic skeleton timepieces engineered for architectural contrast.'],
+        'AURELION ROYALE': ['AURELION ROYALE', '18k champagne gold and 950 platinum classical horology celebrating grand-feu dials and hand-beveled bridges.'],
+        'AURELION CHRONOS': ['AURELION CHRONOS', 'High-frequency column-wheel chronographs calibrated for split-second timing precision.'],
+        'AURELION INFINITE': ['AURELION INFINITE', 'Avant-garde three-dimensional calibers pushing mechanical architecture beyond convention.']
+      };
+      document.getElementById('collection-banner-title').textContent = descriptions[col][0];
+      document.getElementById('collection-banner-desc').textContent = descriptions[col][1];
+      renderProductsGrid();
+    }
+
+    function renderProductsGrid() {
+      const grid = document.getElementById('products-grid');
+      const items = activeCollectionFilter === 'ALL'
+        ? WATCH_CATALOGUE
+        : WATCH_CATALOGUE.filter(w => w.collection === activeCollectionFilter);
+
+      grid.innerHTML = items.map(watch => {
+        const isWished = wishlist.some(w => w.id === watch.id);
+        return `
+          <article class="group bg-charcoal hairline-subtle hover:border-champagne/50 transition-all duration-500 flex flex-col justify-between p-6">
+            <div>
+              <div class="flex items-center justify-between text-[9px] tracking-ultra uppercase mb-4">
+                <span class="text-champagne">${watch.collection.replace('AURELION ', '')}</span>
+                <button onclick="toggleWishlistItem('${watch.id}')" aria-label="Toggle Wishlist" class="text-sm ${isWished ? 'text-champagne' : 'text-titanium/50 hover:text-champagne'} transition-colors">
+                  ${isWished ? '&#9829;' : '&#9825;'}
+                </button>
+              </div>
+
+              <div onclick="openProductModal('${watch.id}')" class="cursor-pointer py-6 bg-obsidian/70 hairline-subtle mb-5 relative overflow-hidden">
+                ${renderWatchArtSVG(watch)}
+                <span class="absolute bottom-2.5 right-3 text-[9px] tracking-widest uppercase text-champagne opacity-0 group-hover:opacity-100 transition-opacity">Inspect 3D &rarr;</span>
+              </div>
+
+              <p class="text-[10px] font-mono text-titanium/70">${watch.ref}</p>
+              <h3 onclick="openProductModal('${watch.id}')" class="cursor-pointer font-serif text-2xl text-ivory group-hover:text-champagne transition-colors mt-0.5">${watch.name}</h3>
+              <p class="text-xs text-titanium mt-1.5 line-clamp-2 font-light">${watch.caseMaterial} • ${watch.caliber}</p>
+            </div>
+
+            <div class="mt-6 pt-4 border-t border-ivory/10">
+              <div class="flex items-baseline justify-between mb-4">
+                <span class="font-serif text-2xl text-ivory">${formatPrice(watch.priceINR)}</span>
+                <span class="text-[9px] uppercase tracking-wider text-champagne">In Stock</span>
+              </div>
+              <div class="grid grid-cols-2 gap-2">
+                <button onclick="openProductModal('${watch.id}')" class="py-2.5 bg-obsidian hairline-subtle text-[10px] tracking-editorial uppercase text-ivory hover:border-champagne transition-colors">3D Details</button>
+                <button onclick="addWatchToBag('${watch.id}')" class="py-2.5 bg-champagne text-obsidian font-semibold text-[10px] tracking-editorial uppercase hover:bg-ivory transition-colors">Add to Bag</button>
+              </div>
+            </div>
+          </article>
+        `;
+      }).join('');
+    }
+
+    function openProductModal(watchId) {
+      const watch = WATCH_CATALOGUE.find(w => w.id === watchId);
+      if (!watch) return;
+      currentPdpWatch = watch;
+      currentPdpStrap = { label: watch.strapLabel, type: watch.strapType };
+      pdpExploded = false;
+
+      document.getElementById('pdp-collection-tag').textContent = watch.collection;
+      document.getElementById('pdp-ref-tag').textContent = `REF. ${watch.ref}`;
+      document.getElementById('pdp-availability').textContent = watch.availability;
+      document.getElementById('pdp-title').textContent = watch.name;
+      document.getElementById('pdp-price').textContent = formatPrice(watch.priceINR);
+      document.getElementById('pdp-description').textContent = watch.description;
+      document.getElementById('pdp-wr').textContent = watch.waterResistance;
+      document.getElementById('pdp-pr').textContent = watch.powerReserve;
+      document.getElementById('pdp-caliber').textContent = watch.caliber;
+      document.getElementById('pdp-case').textContent = watch.caseMaterial;
+      document.getElementById('pdp-dimensions').textContent = watch.dimensions;
+
+      document.getElementById('pdp-add-bag-btn').onclick = () => {
+        addWatchToBag(watch.id, currentPdpStrap.label);
+      };
+      document.getElementById('pdp-buy-now-btn').onclick = () => {
+        addWatchToBag(watch.id, currentPdpStrap.label);
+        closeProductModal();
+        openDrawer('bag');
+        openCheckoutView();
+      };
+      document.getElementById('pdp-wishlist-btn').onclick = () => toggleWishlistItem(watch.id);
+
+      const modal = document.getElementById('product-modal');
+      modal.classList.remove('hidden');
+
+      if (!pdpVP) {
+        pdpVP = createViewport('pdp-canvas-container', watch, { camPos: [0.45, 0.25, 4.9], autoRotate: true, autoRotateSpeed: 0.8 });
+      } else {
+        pdpVP.watch.setMaterials(watch);
+        pdpVP.watch.setExplosionAmount(0);
+      }
+    }
+
+    function closeProductModal() {
+      document.getElementById('product-modal').classList.add('hidden');
+    }
+
+    function setPdpCamera(view) {
+      if (!pdpVP) return;
+      const map = {
+        front: new THREE.Vector3(0, 0, 4.8),
+        side: new THREE.Vector3(4.8, 0.1, 0.1),
+        back: new THREE.Vector3(0, 0, -4.8)
+      };
+      if (map[view]) pdpVP.targetCamPos = map[view];
+    }
+
+    function togglePdpExplode() {
+      if (!pdpVP) return;
+      pdpExploded = !pdpExploded;
+      pdpVP.watch.setExplosionAmount(pdpExploded ? 0.9 : 0);
+      pdpVP.targetCamPos = pdpExploded ? new THREE.Vector3(3.4, 1.3, 4.2) : new THREE.Vector3(0.45, 0.25, 4.9);
+      document.getElementById('pdp-explode-btn').textContent = pdpExploded ? 'Assemble Caliber' : 'Explode Caliber';
+    }
+
+    function selectPdpStrap(label, type) {
+      currentPdpStrap = { label, type };
+      if (pdpVP) pdpVP.watch.setMaterials({ strapType: type });
+      document.querySelectorAll('.pdp-strap-btn').forEach(btn => {
+        const active = btn.textContent === label;
+        btn.classList.toggle('border-champagne', active);
+        btn.classList.toggle('text-ivory', active);
+      });
+    }
+
+    /* -----------------------------------------------------------------------
+       7. BESPOKE WATCH CONFIGURATOR ("YOUR TIME. YOUR SIGNATURE.")
+    ----------------------------------------------------------------------- */
+    const BESPOKE_OPTIONS = {
+      case: [
+        { id: 'titanium', label: 'Grade 5 Titanium', delta: 0, code: 'TI' },
+        { id: 'gold', label: '18k Rose Gold', delta: 380000, code: 'RG' },
+        { id: 'platinum', label: '950 Platinum', delta: 690000, code: 'PT' },
+        { id: 'ceramic', label: 'Black Ceramic', delta: 190000, code: 'CE' }
+      ],
+      dial: [
+        { id: 'skeleton', label: 'Full Openworked Skeleton', delta: 140000, code: 'SK' },
+        { id: 'obsidian', label: 'Obsidian Black', delta: 0, code: 'OB' },
+        { id: 'ivory', label: 'Arctic White Ivory', delta: 45000, code: 'IV' },
+        { id: 'midnight', label: 'Midnight Blue', delta: 65000, code: 'MB' }
+      ],
+      strap: [
+        { id: 'rubber', label: 'Black FKM Rubber', delta: 0, code: 'RB' },
+        { id: 'bracelet', label: 'Titanium Bracelet', delta: 165000, code: 'BR' },
+        { id: 'leather', label: 'Italian Calfskin', delta: 45000, code: 'IT' },
+        { id: 'alligator', label: 'Alligator-Style Leather', delta: 85000, code: 'AL' }
+      ],
+      finish: [
+        { id: 'brushed', label: 'Brushed', delta: 0 },
+        { id: 'polished', label: 'Polished', delta: 35000 },
+        { id: 'satin', label: 'Satin', delta: 25000 }
+      ],
+      hands: [
+        { id: 'gold', label: 'Gold', delta: 40000 },
+        { id: 'silver', label: 'Silver', delta: 0 },
+        { id: 'black', label: 'Black', delta: 20000 }
+      ]
+    };
+
+    let bespokeState = {
+      case: BESPOKE_OPTIONS.case[0],
+      dial: BESPOKE_OPTIONS.dial[0],
+      strap: BESPOKE_OPTIONS.strap[0],
+      finish: BESPOKE_OPTIONS.finish[0],
+      hands: BESPOKE_OPTIONS.hands[0]
+    };
+
+    function renderBespokeSelectors() {
+      const renderGroup = (containerId, groupKey) => {
+        const el = document.getElementById(containerId);
+        el.innerHTML = BESPOKE_OPTIONS[groupKey].map(opt => {
+          const active = bespokeState[groupKey].id === opt.id;
+          return `
+            <button onclick="selectBespokeOption('${groupKey}', '${opt.id}')"
+              class="px-3 py-2.5 text-left text-[11px] border transition-colors ${active ? 'bg-charcoal border-champagne text-ivory' : 'bg-charcoal/40 border-ivory/15 text-titanium hover:text-ivory'}">
+              <span class="block font-medium truncate">${opt.label}</span>
+              <span class="text-[9px] text-champagne">${opt.delta === 0 ? 'Included' : '+' + formatPrice(opt.delta)}</span>
+            </button>
+          `;
+        }).join('');
+      };
+
+      renderGroup('cfg-case-options', 'case');
+      renderGroup('cfg-dial-options', 'dial');
+      renderGroup('cfg-strap-options', 'strap');
+      renderGroup('cfg-finish-options', 'finish');
+      renderGroup('cfg-hands-options', 'hands');
+    }
+
+    function selectBespokeOption(groupKey, optionId) {
+      const found = BESPOKE_OPTIONS[groupKey].find(o => o.id === optionId);
+      if (!found) return;
+      bespokeState[groupKey] = found;
+      updateBespokeUI();
+
+      if (bespokeVP) {
+        bespokeVP.watch.setMaterials({
+          caseType: bespokeState.case.id,
+          dialType: bespokeState.dial.id,
+          strapType: bespokeState.strap.id === 'bracelet' ? 'bracelet' : 'rubber',
+          finishType: bespokeState.finish.id,
+          handsType: bespokeState.hands.id
+        });
+      }
+    }
+
+    function getBespokePriceINR() {
+      return 1000000 + bespokeState.case.delta + bespokeState.dial.delta + bespokeState.strap.delta + bespokeState.finish.delta + bespokeState.hands.delta;
+    }
+
+    function updateBespokeUI() {
+      renderBespokeSelectors();
+      document.getElementById('label-case').textContent = bespokeState.case.label;
+      document.getElementById('label-dial').textContent = bespokeState.dial.label;
+      document.getElementById('label-strap').textContent = bespokeState.strap.label;
+      document.getElementById('label-finish').textContent = bespokeState.finish.label;
+      document.getElementById('label-hands').textContent = bespokeState.hands.label;
+
+      const ref = `AU-BESPOKE-${bespokeState.case.code}-${bespokeState.dial.code}`;
+      document.getElementById('bespoke-ref-code').textContent = ref;
+      document.getElementById('bespoke-price').textContent = formatPrice(getBespokePriceINR());
+      document.getElementById('bespoke-summary-text').textContent =
+        `${bespokeState.case.label} case with ${bespokeState.finish.label} bevels, ${bespokeState.dial.label} dial, ${bespokeState.hands.label} hands, paired with ${bespokeState.strap.label}.`;
+    }
+
+    function resetBespokeConfig() {
+      bespokeState = {
+        case: BESPOKE_OPTIONS.case[0],
+        dial: BESPOKE_OPTIONS.dial[0],
+        strap: BESPOKE_OPTIONS.strap[0],
+        finish: BESPOKE_OPTIONS.finish[0],
+        hands: BESPOKE_OPTIONS.hands[0]
+      };
+      updateBespokeUI();
+      if (bespokeVP) {
+        bespokeVP.watch.setMaterials({ caseType: 'titanium', dialType: 'skeleton', strapType: 'rubber', finishType: 'brushed', handsType: 'gold' });
+      }
+      showToast('Bespoke studio reset to baseline configuration.');
+    }
+
+    function buildBespokeProductObj() {
+      return {
+        id: `bespoke-${bespokeState.case.code}-${bespokeState.dial.code}-${bespokeState.strap.code}`,
+        ref: `AU-BESPOKE-${bespokeState.case.code}-${bespokeState.dial.code}`,
+        name: `Bespoke Sur-Mesure (${bespokeState.case.label})`,
+        collection: 'AURELION BESPOKE',
+        priceINR: getBespokePriceINR(),
+        caseType: bespokeState.case.id,
+        dialType: bespokeState.dial.id,
+        strapLabel: `${bespokeState.dial.label} • ${bespokeState.strap.label} • ${bespokeState.finish.label}`
+      };
+    }
+
+    function saveBespokeToWishlist() {
+      const item = buildBespokeProductObj();
+      if (!wishlist.some(w => w.id === item.id)) {
+        wishlist.push(item);
+        persistState();
+        showToast('Bespoke specification saved to Collector Wishlist.');
+      } else {
+        showToast('Specification already saved in Wishlist.');
+      }
+    }
+
+    function addBespokeToBag() {
+      const item = buildBespokeProductObj();
+      addCustomItemToBag(item);
+    }
+
+    /* -----------------------------------------------------------------------
+       8. TECHNICAL SPECIFICATION EXPLORER & COMPARISON STUDIO
+    ----------------------------------------------------------------------- */
+    function switchCaliberSpec(calKey) {
+      const spec = CALIBER_SPECS[calKey];
+      if (!spec) return;
+      document.getElementById('tab-au01').className = calKey === 'AU01'
+        ? 'px-4 py-2 text-[10px] tracking-editorial uppercase bg-champagne text-obsidian font-semibold'
+        : 'px-4 py-2 text-[10px] tracking-editorial uppercase bg-obsidian border border-ivory/15 text-titanium hover:text-ivory';
+      document.getElementById('tab-au09').className = calKey === 'AU09'
+        ? 'px-4 py-2 text-[10px] tracking-editorial uppercase bg-champagne text-obsidian font-semibold'
+        : 'px-4 py-2 text-[10px] tracking-editorial uppercase bg-obsidian border border-ivory/15 text-titanium hover:text-ivory';
+
+      document.getElementById('spec-caliber-subtitle').textContent = spec.subtitle;
+      document.getElementById('spec-data-grid').innerHTML = spec.items.map(([label, val]) => `
+        <div class="p-4 bg-obsidian hairline-subtle">
+          <span class="block text-[9px] tracking-ultra uppercase text-champagne">${label}</span>
+          <span class="block text-sm text-ivory font-medium mt-1">${val}</span>
+        </div>
+      `).join('');
+    }
+
+    function initComparisonSelectors() {
+      const selA = document.getElementById('compare-select-a');
+      const selB = document.getElementById('compare-select-b');
+      const opts = WATCH_CATALOGUE.map((w, idx) => `<option value="${w.id}" ${idx === 0 ? 'selected' : ''}>${w.name} (${w.ref})</option>`).join('');
+      const optsB = WATCH_CATALOGUE.map((w, idx) => `<option value="${w.id}" ${idx === 2 ? 'selected' : ''}>${w.name} (${w.ref})</option>`).join('');
+      selA.innerHTML = opts;
+      selB.innerHTML = optsB;
+      updateComparison();
+    }
+
+    function updateComparison() {
+      const idA = document.getElementById('compare-select-a').value;
+      const idB = document.getElementById('compare-select-b').value;
+      const wA = WATCH_CATALOGUE.find(w => w.id === idA) || WATCH_CATALOGUE[0];
+      const wB = WATCH_CATALOGUE.find(w => w.id === idB) || WATCH_CATALOGUE[2];
+
+      document.getElementById('comp-label-a').textContent = wA.name;
+      document.getElementById('comp-label-b').textContent = wB.name;
+      document.getElementById('comp-th-a').textContent = wA.name;
+      document.getElementById('comp-th-b').textContent = wB.name;
+
+      if (compareVPA) compareVPA.watch.setMaterials(wA);
+      if (compareVPB) compareVPB.watch.setMaterials(wB);
+
+      const rows = [
+        ['Collection Lineage', wA.collection, wB.collection],
+        ['Valuation', formatPrice(wA.priceINR), formatPrice(wB.priceINR)],
+        ['Case Material', wA.caseMaterial, wB.caseMaterial],
+        ['Movement Caliber', wA.caliber, wB.caliber],
+        ['Power Reserve', wA.powerReserve, wB.powerReserve],
+        ['Case Dimensions', wA.dimensions, wB.dimensions],
+        ['Water Resistance', wA.waterResistance, wB.waterResistance],
+        ['Strap / Bracelet', wA.strapLabel, wB.strapLabel]
+      ];
+
+      document.getElementById('comparison-tbody').innerHTML = rows.map(([attr, valA, valB]) => `
+        <tr class="hover:bg-charcoal/50 transition-colors">
+          <td class="py-3.5 px-6 text-titanium uppercase text-[10px] tracking-wider">${attr}</td>
+          <td class="py-3.5 px-6 font-medium">${valA}</td>
+          <td class="py-3.5 px-6 font-medium">${valB}</td>
+        </tr>
+      `).join('');
+    }
+
+    /* -----------------------------------------------------------------------
+       9. JOURNAL, SEARCH, CONCIERGE & MODALS
+    ----------------------------------------------------------------------- */
+    function renderJournalGrid() {
+      document.getElementById('journal-grid').innerHTML = JOURNAL_ARTICLES.map((art, idx) => `
+        <article onclick="openArticleModal('${art.id}')" class="cursor-pointer group bg-charcoal hairline-subtle hover:border-champagne/50 p-7 flex flex-col justify-between transition-all ${idx === 0 ? 'lg:col-span-2' : ''}">
+          <div>
+            <div class="flex items-center justify-between text-[10px] tracking-ultra text-champagne uppercase mb-4">
+              <span>${art.category}</span>
+              <span class="text-titanium">${art.readTime}</span>
+            </div>
+            <h3 class="font-serif text-3xl text-ivory group-hover:text-champagne transition-colors leading-snug">${art.title}</h3>
+            <p class="text-xs text-titanium mt-3 leading-relaxed font-light">${art.excerpt}</p>
+          </div>
+          <div class="mt-8 pt-4 border-t border-ivory/10 flex items-center justify-between text-[10px] tracking-editorial uppercase text-ivory group-hover:text-champagne">
+            <span>Read Monograph</span>
+            <span>&rarr;</span>
+          </div>
+        </article>
+      `).join('');
+    }
+
+    function openArticleModal(artId) {
+      const art = JOURNAL_ARTICLES.find(a => a.id === artId);
+      if (!art) return;
+      document.getElementById('article-category').textContent = art.category;
+      document.getElementById('article-title').textContent = art.title;
+      document.getElementById('article-meta').textContent = `${art.readTime} • Published by AURELION Editorial Desk`;
+      document.getElementById('article-body').innerHTML = art.content.map(p => `<p>${p}</p>`).join('');
+      document.getElementById('article-modal').classList.remove('hidden');
+    }
+
+    function closeArticleModal() {
+      document.getElementById('article-modal').classList.add('hidden');
+    }
+
+    function openSearchModal() {
+      document.getElementById('search-modal').classList.remove('hidden');
+      const input = document.getElementById('search-input');
+      input.value = '';
+      performSearch('');
+      setTimeout(() => input.focus(), 100);
+    }
+
+    function closeSearchModal() {
+      document.getElementById('search-modal').classList.add('hidden');
+    }
+
+    function performSearch(query) {
+      const q = query.trim().toLowerCase();
+      const matchedWatches = WATCH_CATALOGUE.filter(w =>
+        !q || w.name.toLowerCase().includes(q) || w.collection.toLowerCase().includes(q) || w.caseMaterial.toLowerCase().includes(q) || w.caliber.toLowerCase().includes(q)
+      );
+      const matchedArticles = JOURNAL_ARTICLES.filter(a =>
+        !q || a.title.toLowerCase().includes(q) || a.excerpt.toLowerCase().includes(q)
+      );
+
+      let html = matchedWatches.slice(0, 4).map(w => `
+        <div onclick="closeSearchModal(); openProductModal('${w.id}')" class="cursor-pointer p-4 bg-charcoal hairline-subtle hover:border-champagne transition-colors flex justify-between items-center">
+          <div>
+            <span class="text-[9px] tracking-ultra text-champagne uppercase block">${w.collection}</span>
+            <span class="font-serif text-xl text-ivory">${w.name}</span>
+          </div>
+          <span class="font-serif text-lg text-champagne">${formatPrice(w.priceINR)}</span>
+        </div>
+      `).join('');
+
+      html += matchedArticles.slice(0, 2).map(a => `
+        <div onclick="closeSearchModal(); openArticleModal('${a.id}')" class="cursor-pointer p-4 bg-charcoal/60 hairline-subtle hover:border-champagne transition-colors">
+          <span class="text-[9px] tracking-ultra text-titanium uppercase block">Journal Article</span>
+          <span class="font-serif text-xl text-ivory">${a.title}</span>
+        </div>
+      `).join('');
+
+      document.getElementById('search-results').innerHTML = html || `<p class="text-sm text-titanium">No archival entries matching "${query}".</p>`;
+    }
+
+    function handleConciergeSubmit(e) {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      const refNum = 'AU-CON-' + Math.floor(100000 + Math.random() * 900000);
+      document.getElementById('concierge-form').classList.add('hidden');
+      document.getElementById('concierge-confirmation').classList.remove('hidden');
+      document.getElementById('concierge-ref-msg').textContent =
+        `Thank you, ${formData.get('name')}. Your request for ${formData.get('salon')} regarding ${formData.get('watch')} has been registered under Dossier ${refNum}.`;
+      showToast(`Private Consultation Confirmed (${refNum})`);
+    }
+
+    function resetConciergeForm() {
+      document.getElementById('concierge-form').reset();
+      document.getElementById('concierge-form').classList.remove('hidden');
+      document.getElementById('concierge-confirmation').classList.add('hidden');
+    }
+
+    function handleNewsletterSubmit(e) {
+      e.preventDefault();
+      e.target.reset();
+      showToast('Subscribed to AURELION Private Dispatch.');
+    }
+
+    function openPolicyModal(title, text) {
+      document.getElementById('policy-modal-title').textContent = title;
+      document.getElementById('policy-modal-text').textContent = text;
+      const m = document.getElementById('policy-modal');
+      m.classList.remove('hidden');
+      m.classList.add('flex');
+    }
+
+    function closePolicyModal() {
+      const m = document.getElementById('policy-modal');
+      m.classList.add('hidden');
+      m.classList.remove('flex');
+    }
+
+    /* -----------------------------------------------------------------------
+       10. SHOPPING BAG, WISHLIST & DEMO CHECKOUT ENGINE
+    ----------------------------------------------------------------------- */
+    function persistState() {
+      localStorage.setItem('aurelion_bag', JSON.stringify(bag));
+      localStorage.setItem('aurelion_wishlist', JSON.stringify(wishlist));
+      renderBagAndWishlist();
+      renderProductsGrid();
+    }
+
+    function addWatchToBag(watchId, customStrap) {
+      const w = WATCH_CATALOGUE.find(item => item.id === watchId);
+      if (!w) return;
+      const strapUsed = customStrap || w.strapLabel;
+      const existing = bag.find(item => item.id === w.id && item.strapLabel === strapUsed);
+      if (existing) {
+        existing.qty += 1;
+      } else {
+        bag.push({
+          id: w.id,
+          ref: w.ref,
+          name: w.name,
+          priceINR: w.priceINR,
+          strapLabel: strapUsed,
+          qty: 1
+        });
+      }
+      persistState();
+      showToast(`${w.name} added to your Shopping Bag.`);
+    }
+
+    function addCustomItemToBag(customObj) {
+      const existing = bag.find(item => item.id === customObj.id);
+      if (existing) {
+        existing.qty += 1;
+      } else {
+        bag.push({ ...customObj, qty: 1 });
+      }
+      persistState();
+      openDrawer('bag');
+      showToast(`Bespoke timepiece added to your Shopping Bag.`);
+    }
+
+    function updateBagQty(index, delta) {
+      if (!bag[index]) return;
+      bag[index].qty += delta;
+      if (bag[index].qty <= 0) bag.splice(index, 1);
+      persistState();
+    }
+
+    function toggleWishlistItem(watchId) {
+      const w = WATCH_CATALOGUE.find(item => item.id === watchId);
+      if (!w) return;
+      const idx = wishlist.findIndex(item => item.id === watchId);
+      if (idx >= 0) {
+        wishlist.splice(idx, 1);
+        showToast(`${w.name} removed from Wishlist.`);
+      } else {
+        wishlist.push(w);
+        showToast(`${w.name} saved to Collector Wishlist.`);
+      }
+      persistState();
+    }
+
+    function renderBagAndWishlist() {
+      const totalItems = bag.reduce((sum, i) => sum + i.qty, 0);
+      const subtotalINR = bag.reduce((sum, i) => sum + i.priceINR * i.qty, 0);
+
+      document.getElementById('bag-badge').textContent = totalItems;
+      document.getElementById('drawer-bag-count').textContent = totalItems;
+
+      const wishBadge = document.getElementById('wishlist-badge');
+      wishBadge.textContent = wishlist.length;
+      wishBadge.classList.toggle('hidden', wishlist.length === 0);
+      document.getElementById('drawer-wish-count').textContent = wishlist.length;
+
+      const bagContainer = document.getElementById('bag-items-container');
+      const bagFooter = document.getElementById('bag-summary-footer');
+
+      if (bag.length === 0) {
+        bagContainer.innerHTML = `<div class="py-16 text-center text-xs text-titanium">Your AURELION presentation bag is currently empty.</div>`;
+        bagFooter.classList.add('hidden');
+      } else {
+        bagFooter.classList.remove('hidden');
+        bagContainer.innerHTML = bag.map((item, idx) => `
+          <div class="p-4 bg-obsidian hairline-subtle flex justify-between gap-4">
+            <div class="space-y-1">
+              <span class="text-[9px] font-mono text-champagne">${item.ref}</span>
+              <h4 class="font-serif text-xl text-ivory">${item.name}</h4>
+              <p class="text-[11px] text-titanium">${item.strapLabel}</p>
+              <p class="text-xs text-ivory pt-1">${formatPrice(item.priceINR * item.qty)}</p>
+            </div>
+            <div class="flex flex-col items-end justify-between">
+              <button onclick="updateBagQty(${idx}, -${item.qty})" class="text-[10px] text-titanium hover:text-champagne uppercase">Remove</button>
+              <div class="flex items-center border border-ivory/15">
+                <button onclick="updateBagQty(${idx}, -1)" class="px-2.5 py-1 text-xs text-ivory hover:bg-charcoal">&minus;</button>
+                <span class="px-2.5 py-1 text-xs text-ivory">${item.qty}</span>
+                <button onclick="updateBagQty(${idx}, 1)" class="px-2.5 py-1 text-xs text-ivory hover:bg-charcoal">+</button>
+              </div>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      document.getElementById('bag-subtotal').textContent = formatPrice(subtotalINR);
+      document.getElementById('bag-total').textContent = formatPrice(subtotalINR);
+
+      // Wishlist rendering
+      const wishContainer = document.getElementById('wishlist-items-container');
+      if (wishlist.length === 0) {
+        wishContainer.innerHTML = `<div class="py-16 text-center text-xs text-titanium">No timepieces saved in your Collector Wishlist yet.</div>`;
+      } else {
+        wishContainer.innerHTML = wishlist.map(item => `
+          <div class="p-4 bg-obsidian hairline-subtle flex justify-between items-center gap-4">
+            <div>
+              <span class="text-[9px] font-mono text-champagne">${item.ref}</span>
+              <h4 class="font-serif text-xl text-ivory">${item.name}</h4>
+              <p class="text-xs text-champagne mt-1">${formatPrice(item.priceINR)}</p>
+            </div>
+            <div class="flex flex-col gap-2">
+              <button onclick="addCustomItemToBag({id:'${item.id}', ref:'${item.ref}', name:'${item.name}', priceINR:${item.priceINR}, strapLabel:'${item.strapLabel}'})" class="px-3 py-1.5 bg-champagne text-obsidian font-semibold text-[10px] uppercase tracking-wider">Move to Bag</button>
+              <button onclick="wishlist = wishlist.filter(w => w.id !== '${item.id}'); persistState();" class="text-[10px] text-titanium hover:text-ivory uppercase">Remove</button>
+            </div>
+          </div>
+        `).join('');
+      }
+    }
+
+    function openDrawer(tab = 'bag') {
+      const drawer = document.getElementById('side-drawer');
+      drawer.classList.remove('hidden');
+      drawer.classList.add('flex');
+      switchDrawerTab(tab);
+    }
+
+    function closeDrawer() {
+      const drawer = document.getElementById('side-drawer');
+      drawer.classList.add('hidden');
+      drawer.classList.remove('flex');
+    }
+
+    function switchDrawerTab(tab) {
+      document.getElementById('drawer-bag-view').classList.toggle('hidden', tab !== 'bag');
+      document.getElementById('drawer-wishlist-view').classList.toggle('hidden', tab !== 'wishlist');
+      document.getElementById('drawer-checkout-view').classList.toggle('hidden', tab !== 'checkout');
+      document.getElementById('drawer-confirm-view').classList.toggle('hidden', tab !== 'confirm');
+
+      document.getElementById('drawer-tab-bag').className = tab === 'bag' || tab === 'checkout'
+        ? 'text-xs tracking-editorial uppercase text-champagne border-b border-champagne pb-1'
+        : 'text-xs tracking-editorial uppercase text-titanium pb-1';
+      document.getElementById('drawer-tab-wishlist').className = tab === 'wishlist'
+        ? 'text-xs tracking-editorial uppercase text-champagne border-b border-champagne pb-1'
+        : 'text-xs tracking-editorial uppercase text-titanium pb-1';
+    }
+
+    function openCheckoutView() {
+      if (bag.length === 0) return;
+      switchDrawerTab('checkout');
+    }
+
+    function handleCheckoutSubmit(e) {
+      e.preventDefault();
+      const fd = new FormData(e.target);
+      const totalINR = bag.reduce((sum, i) => sum + i.priceINR * i.qty, 0);
+      const orderId = 'AU-ALLOC-' + Math.floor(100000 + Math.random() * 900000);
+
+      document.getElementById('order-cert-details').textContent =
+        `Demo Order confirmed for ${fd.get('fullName')} (${fd.get('city')}, ${fd.get('state')} ${fd.get('pincode')}). Total Allocation Valuation: ${formatPrice(totalINR)}.`;
+      document.getElementById('order-cert-id').textContent = `CERTIFICATE ID: ${orderId}`;
+
+      bag = [];
+      persistState();
+      e.target.reset();
+      switchDrawerTab('confirm');
+      showToast('Demo Acquisition Certificate Generated.');
+    }
+
+    /* -----------------------------------------------------------------------
+       11. NAVIGATION, PRELOADER & TOAST SYSTEM
+    ----------------------------------------------------------------------- */
+    function toggleFullscreenMenu() {
+      const menu = document.getElementById('fullscreen-menu');
+      const isHidden = menu.classList.contains('hidden');
+      if (isHidden) {
+        menu.classList.remove('hidden');
+        requestAnimationFrame(() => menu.classList.remove('opacity-0'));
+      } else {
+        menu.classList.add('opacity-0');
+        setTimeout(() => menu.classList.add('hidden'), 450);
+      }
+    }
+
+    function showToast(message) {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = 'bg-charcoal/95 backdrop-blur-md hairline-border px-5 py-3.5 text-xs text-ivory shadow-2xl transition-all duration-300 translate-y-2 opacity-0';
+      toast.innerHTML = `<span class="text-champagne mr-2">&#9670;</span>${message}`;
+      container.appendChild(toast);
+      requestAnimationFrame(() => toast.classList.remove('translate-y-2', 'opacity-0'));
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-2');
+        setTimeout(() => toast.remove(), 300);
+      }, 3200);
+    }
+
+    // Navbar scroll glass effect & Scroll-linked Hero Watch subtle parallax
+    window.addEventListener('scroll', () => {
+      const nav = document.getElementById('navbar');
+      if (window.scrollY > 40) {
+        nav.classList.add('bg-obsidian/90', 'backdrop-blur-lg', 'border-ivory/10');
+      } else {
+        nav.classList.remove('bg-obsidian/90', 'backdrop-blur-lg', 'border-ivory/10');
+      }
+
+      if (heroVP && window.scrollY < window.innerHeight) {
+        const progress = window.scrollY / window.innerHeight;
+        heroVP.watch.root.position.y = -progress * 0.45;
+        heroVP.watch.root.rotation.x = -0.18 + progress * 0.35;
+      }
+    });
+
+    // Intersection Observer for editorial section reveals
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) entry.target.classList.add('is-visible');
+      });
+    }, { threshold: 0.1 });
+
+    // Preloader & Boot Sequence
+    window.addEventListener('DOMContentLoaded', () => {
+      renderComponentList();
+      renderProductsGrid();
+      updateBespokeUI();
+      switchCaliberSpec('AU01');
+      renderJournalGrid();
+      renderBagAndWishlist();
+
+      // Populate Concierge Watch Dropdown
+      document.getElementById('concierge-watch-select').innerHTML =
+        WATCH_CATALOGUE.map(w => `<option>${w.name} (${w.ref})</option>`).join('') +
+        `<option>Bespoke Sur-Mesure Commission</option>`;
+
+      document.querySelectorAll('.reveal-section').forEach(el => revealObserver.observe(el));
+
+      // Initialize Three.js Scenes
+      initAll3DViewports();
+      initComparisonSelectors();
+      animateMasterLoop();
+
+      // Smooth Preloader Progress
+      let pct = 0;
+      const bar = document.getElementById('preloader-bar');
+      const label = document.getElementById('preloader-percent');
+      const preloader = document.getElementById('preloader');
+
+      const interval = setInterval(() => {
+        pct += Math.floor(Math.random() * 24) + 14;
+        if (pct >= 100) {
+          pct = 100;
+          clearInterval(interval);
+          bar.style.width = '100%';
+          label.textContent = 'CALIBRATED 28,800 VPH — 100%';
+          setTimeout(() => {
+            preloader.classList.add('opacity-0');
+            setTimeout(() => preloader.remove(), 900);
+          }, 300);
+        } else {
+          bar.style.width = pct + '%';
+          label.textContent = `CALIBRATING 28,800 VPH — ${pct}%`;
+        }
+      }, 110);
+    });
+  </script>
+</body>
+</html>
