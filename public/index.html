@@ -4,7 +4,14 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AURELION — Time Is An Art Form | Haute Horlogerie</title>
-  <meta name="description" content="AURELION Swiss-inspired haute horlogerie digital flagship. Engineered beyond precision. Designed beyond time." />
+  <meta name="description" content="Discover AURELION — a Swiss-inspired haute horlogerie concept with editorial product photography, watch specifications, bespoke options and interactive movement studies." />
+  <meta name="theme-color" content="#080909" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="canonical" href="https://watch.manojroyal1320.workers.dev/" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="AURELION — Time Is An Art Form" />
+  <meta property="og:description" content="Engineered beyond precision. Designed beyond time." />
+  <meta property="og:image" content="/assets/aurelion-hero.png" />
 
   <!-- Google Fonts: Cormorant Garamond & Manrope / Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -58,6 +65,7 @@
       scrollbar-color: #343638 #080909;
     }
 
+    html { scroll-padding-top: 88px; }
     body {
       background-color: #080909;
       color: #EAE5DB;
@@ -131,6 +139,12 @@
       touch-action: pan-y;
     }
 
+    .hero-feature-card { box-shadow: 0 18px 60px rgba(0,0,0,.32); }
+    .product-photo { width:100%; aspect-ratio: 4 / 4.5; object-fit:cover; display:block; transition:transform .7s cubic-bezier(.16,1,.3,1); }
+    .product-photo-wrap { background:#090909; overflow:hidden; position:relative; }
+    .photo-unavailable { min-height: 260px; display:flex; align-items:center; justify-content:center; background: radial-gradient(ellipse at 50% 40%, #28231b 0%, #10100f 62%, #080909 100%); }
+    .photo-unavailable::after { content:'AURELION  ·  PRODUCT PHOTOGRAPHY'; color:rgba(197,164,109,.72); font-size:9px; letter-spacing:.24em; text-align:center; padding:16px; }
+    .group:hover .product-photo { transform:scale(1.045); }
     /* Editorial reveal */
     .reveal-section {
       opacity: 0;
@@ -209,180 +223,74 @@
   <!-- =====================================================================
        02. FLOATING LUXURY NAVIGATION
   ====================================================================== -->
-  <header id="navbar" class="fixed top-0 inset-x-0 z-50 transition-all duration-500 border-b border-transparent">
-    <div class="max-w-[1440px] mx-auto px-5 md:px-10 h-20 flex items-center justify-between">
-      <!-- Left: Brand Emblem & Wordmark -->
-      <a href="#hero" class="flex items-center gap-3.5 group">
-        <svg class="w-7 h-7 text-champagne transition-transform duration-500 group-hover:rotate-180" viewBox="0 0 48 48" fill="none">
-          <circle cx="24" cy="24" r="21" stroke="currentColor" stroke-width="1" stroke-opacity="0.45" />
-          <polygon points="24,7 39,37 33,37 24,18 15,37 9,37" stroke="currentColor" stroke-width="1.4" />
-          <line x1="16" y1="29" x2="32" y2="29" stroke="currentColor" stroke-width="1.2" />
-        </svg>
-        <div class="flex flex-col">
-          <span class="font-serif text-xl md:text-2xl tracking-ultra text-ivory leading-none">AURELION</span>
-          <span class="text-[8px] tracking-ultra text-champagne/80 uppercase mt-1 hidden sm:block">Genève • Haute Horlogerie</span>
-        </div>
+  <header id="navbar" class="fixed top-0 inset-x-0 z-[55] border-b border-ivory/10 bg-obsidian/90 backdrop-blur-xl transition-colors duration-300" aria-label="Main navigation">
+    <div class="max-w-[1440px] mx-auto h-[72px] px-4 md:px-8 flex items-center justify-between gap-4">
+      <a href="#hero" class="flex items-center gap-3 shrink-0" aria-label="AURELION home">
+        <svg class="w-8 h-8 text-champagne" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M24 4 44 42h-8L24 18 12 42H4L24 4Z"/><path d="M15 30h18"/></svg>
+        <span class="leading-none"><span class="block font-serif text-xl sm:text-2xl tracking-[0.20em] text-ivory">AURELION</span><span class="block mt-1 text-[8px] tracking-[0.28em] uppercase text-champagne">Haute Horlogerie</span></span>
       </a>
-
-      <!-- Center: Editorial Navigation Links -->
-      <nav class="hidden xl:flex items-center gap-7 text-[11px] tracking-editorial uppercase text-titanium">
-        <a href="#collections" class="hover:text-champagne transition-colors py-2">Collections</a>
-        <a href="#movement-lab" class="hover:text-champagne transition-colors py-2">The Movement</a>
-        <a href="#bespoke" class="hover:text-champagne transition-colors py-2">Bespoke Studio</a>
-        <a href="#comparison" class="hover:text-champagne transition-colors py-2">Comparison</a>
-        <a href="#craft-specs" class="hover:text-champagne transition-colors py-2">Craft &amp; Specs</a>
-        <a href="#journal" class="hover:text-champagne transition-colors py-2">Journal</a>
-        <a href="#concierge" class="hover:text-champagne transition-colors py-2">Concierge</a>
+      <nav class="hidden lg:flex items-center gap-6 xl:gap-8" aria-label="Primary">
+        <a href="#collections" class="text-[10px] tracking-[0.18em] uppercase text-ivory/75 hover:text-champagne transition-colors">Collections</a>
+        <a href="#craft-specs" class="text-[10px] tracking-[0.18em] uppercase text-ivory/75 hover:text-champagne transition-colors">Our Craft</a>
+        <a href="#viewer-studio" class="text-[10px] tracking-[0.18em] uppercase text-ivory/75 hover:text-champagne transition-colors">The Movement</a>
+        <a href="#bespoke" class="text-[10px] tracking-[0.18em] uppercase text-ivory/75 hover:text-champagne transition-colors">Bespoke</a>
+        <a href="#journal" class="text-[10px] tracking-[0.18em] uppercase text-ivory/75 hover:text-champagne transition-colors">Journal</a>
       </nav>
-
-      <!-- Right: Utility Icons (Search, Wishlist, Bag, Menu) -->
-      <div class="flex items-center gap-2 sm:gap-4">
-        <button onclick="openSearchModal()" aria-label="Search Catalogue" class="p-2.5 text-ivory/80 hover:text-champagne transition-colors">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-            <circle cx="11" cy="11" r="7" />
-            <line x1="20" y1="20" x2="16.2" y2="16.2" />
-          </svg>
-        </button>
-
-        <button onclick="openDrawer('wishlist')" aria-label="Wishlist" class="relative p-2.5 text-ivory/80 hover:text-champagne transition-colors">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-            <path d="M12 20.5l-1.45-1.32C5.4 14.5 2 11.42 2 7.65 2 4.58 4.42 2.2 7.5 2.2c1.74 0 3.41.81 4.5 2.09C13.09 3.01 14.76 2.2 16.5 2.2 19.58 2.2 22 4.58 22 7.65c0 3.77-3.4 6.85-8.55 11.54L12 20.5z" />
-          </svg>
-          <span id="wishlist-badge" class="hidden absolute top-1 right-1 w-4 h-4 rounded-full bg-champagne text-obsidian text-[9px] font-semibold flex items-center justify-center">0</span>
-        </button>
-
-        <button onclick="openDrawer('bag')" aria-label="Shopping Bag" class="relative p-2.5 text-ivory/80 hover:text-champagne transition-colors flex items-center gap-2">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-            <path d="M6 7h12l1 13H5L6 7z" />
-            <path d="M9 7V5a3 3 0 016 0v2" />
-          </svg>
-          <span class="hidden md:inline text-[10px] tracking-editorial uppercase">Bag</span>
-          <span id="bag-badge" class="w-4 h-4 rounded-full bg-champagne/90 text-obsidian text-[9px] font-semibold flex items-center justify-center">0</span>
-        </button>
-
-        <button onclick="toggleFullscreenMenu()" aria-label="Open Atelier Menu" class="p-2.5 text-ivory hover:text-champagne transition-colors flex items-center gap-2 border-l border-ivory/10 pl-4">
-          <span class="hidden sm:inline text-[10px] tracking-editorial uppercase">Menu</span>
-          <div class="w-5 flex flex-col gap-1.5">
-            <span class="w-full h-[1px] bg-current"></span>
-            <span class="w-3.5 h-[1px] bg-champagne self-end"></span>
-          </div>
-        </button>
+      <div class="flex items-center gap-1.5 sm:gap-3 shrink-0">
+        <button onclick="openSearchModal()" aria-label="Search watches" class="relative p-2 text-ivory/80 hover:text-champagne transition-colors"><svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg></button>
+        <button onclick="openDrawer('wishlist')" aria-label="Open wishlist" class="relative p-2 text-ivory/80 hover:text-champagne transition-colors"><svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M20.8 8.8c0 5.1-8.8 10.2-8.8 10.2S3.2 13.9 3.2 8.8A4.3 4.3 0 0 1 12 6.5a4.3 4.3 0 0 1 8.8 2.3Z"/></svg><span id="wishlist-badge" class="hidden absolute top-0 right-0 min-w-4 h-4 px-1 rounded-full bg-champagne text-obsidian text-[9px] flex items-center justify-center">0</span></button>
+        <button onclick="openDrawer('bag')" aria-label="Open shopping bag" class="relative p-2 text-ivory/80 hover:text-champagne transition-colors"><svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M5 8h14l-1 13H6L5 8Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg><span id="bag-badge" class="absolute top-0 right-0 min-w-4 h-4 px-1 rounded-full bg-champagne text-obsidian text-[9px] flex items-center justify-center">0</span></button>
+        <button onclick="toggleFullscreenMenu()" aria-label="Open navigation menu" aria-expanded="false" id="mobile-nav-toggle" class="lg:hidden p-2 text-ivory hover:text-champagne"><svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
       </div>
     </div>
   </header>
-
-  <!-- Fullscreen Architectural Menu Overlay -->
-  <div id="fullscreen-menu" class="fixed inset-0 z-[70] bg-obsidian/98 backdrop-blur-xl hidden opacity-0 transition-opacity duration-500 overflow-y-auto">
-    <div class="max-w-[1440px] mx-auto px-6 md:px-12 py-8 min-h-screen flex flex-col justify-between">
-      <div class="flex items-center justify-between border-b border-ivory/10 pb-6">
-        <span class="font-serif text-2xl tracking-ultra text-ivory">AURELION</span>
-        <button onclick="toggleFullscreenMenu()" class="flex items-center gap-3 text-xs tracking-editorial uppercase text-titanium hover:text-champagne transition-colors py-2 px-3">
-          <span>Close</span>
-          <span class="text-lg leading-none">&times;</span>
-        </button>
-      </div>
-
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 my-12">
-        <div class="lg:col-span-7 flex flex-col gap-5">
-          <p class="text-[10px] tracking-ultra text-champagne uppercase mb-2">Navigation Index</p>
-          <a href="#hero" onclick="toggleFullscreenMenu()" class="font-serif text-4xl md:text-6xl font-light text-ivory hover:text-champagne hover:translate-x-3 transition-all">01. Flagship Hero</a>
-          <a href="#viewer-studio" onclick="toggleFullscreenMenu()" class="font-serif text-4xl md:text-6xl font-light text-ivory hover:text-champagne hover:translate-x-3 transition-all">02. 360° Atelier Viewer</a>
-          <a href="#movement-lab" onclick="toggleFullscreenMenu()" class="font-serif text-4xl md:text-6xl font-light text-ivory hover:text-champagne hover:translate-x-3 transition-all">03. Exploded Caliber AU-01</a>
-          <a href="#collections" onclick="toggleFullscreenMenu()" class="font-serif text-4xl md:text-6xl font-light text-ivory hover:text-champagne hover:translate-x-3 transition-all">04. Haute Horlogerie Collections</a>
-          <a href="#bespoke" onclick="toggleFullscreenMenu()" class="font-serif text-4xl md:text-6xl font-light text-ivory hover:text-champagne hover:translate-x-3 transition-all">05. Bespoke Watch Configurator</a>
-          <a href="#comparison" onclick="toggleFullscreenMenu()" class="font-serif text-4xl md:text-6xl font-light text-ivory hover:text-champagne hover:translate-x-3 transition-all">06. Dual Comparison Studio</a>
-          <a href="#craft-specs" onclick="toggleFullscreenMenu()" class="font-serif text-4xl md:text-6xl font-light text-ivory hover:text-champagne hover:translate-x-3 transition-all">07. Craft &amp; Technical Architecture</a>
-          <a href="#journal" onclick="toggleFullscreenMenu()" class="font-serif text-4xl md:text-6xl font-light text-ivory hover:text-champagne hover:translate-x-3 transition-all">08. Editorial Journal</a>
-          <a href="#concierge" onclick="toggleFullscreenMenu()" class="font-serif text-4xl md:text-6xl font-light text-ivory hover:text-champagne hover:translate-x-3 transition-all">09. Private Client Concierge</a>
-        </div>
-
-        <div class="lg:col-span-5 flex flex-col justify-between border-t lg:border-t-0 lg:border-l border-ivory/10 pt-8 lg:pt-0 lg:pl-12">
-          <div class="space-y-6">
-            <p class="text-[10px] tracking-ultra text-champagne uppercase">Maison Philosophy</p>
-            <p class="font-serif text-2xl text-ivory/90 leading-relaxed italic">
-              "Time is not merely measured; it is sculpted in Grade 5 titanium, 18k champagne gold, and hand-beveled sapphire."
-            </p>
-            <div class="grid grid-cols-2 gap-6 pt-6 border-t border-ivory/10 text-xs text-titanium">
-              <div>
-                <p class="text-champagne uppercase tracking-widest text-[10px] mb-1">Geneva Manufacture</p>
-                <p>Rue du Rhône 42, Genève</p>
-              </div>
-              <div>
-                <p class="text-champagne uppercase tracking-widest text-[10px] mb-1">India Flagship Salon</p>
-                <p>UB City, Vittal Mallya Rd, Bengaluru</p>
-              </div>
-            </div>
-          </div>
-
-          <div class="mt-10 p-6 bg-charcoal/80 hairline-border">
-            <p class="text-[10px] tracking-ultra text-champagne uppercase mb-2">Private Appointment</p>
-            <p class="text-xs text-titanium mb-4">Request a one-on-one horological presentation with a Senior Master Specialist.</p>
-            <a href="#concierge" onclick="toggleFullscreenMenu()" class="inline-block text-[11px] tracking-editorial uppercase text-ivory border-b border-champagne pb-1 hover:text-champagne transition-colors">
-              Reserve Private Viewing &rarr;
-            </a>
-          </div>
-        </div>
-      </div>
-    </div>
+  <div id="mobile-nav-panel" class="hidden fixed top-[72px] inset-x-0 z-[54] bg-obsidian/98 backdrop-blur-xl border-b border-champagne/20 px-6 py-6 lg:hidden">
+    <nav class="grid grid-cols-2 gap-4" aria-label="Mobile">
+      <a onclick="toggleFullscreenMenu()" href="#collections" class="text-xs tracking-[0.18em] uppercase text-ivory hover:text-champagne">Collections</a>
+      <a onclick="toggleFullscreenMenu()" href="#craft-specs" class="text-xs tracking-[0.18em] uppercase text-ivory hover:text-champagne">Our Craft</a>
+      <a onclick="toggleFullscreenMenu()" href="#viewer-studio" class="text-xs tracking-[0.18em] uppercase text-ivory hover:text-champagne">The Movement</a>
+      <a onclick="toggleFullscreenMenu()" href="#bespoke" class="text-xs tracking-[0.18em] uppercase text-ivory hover:text-champagne">Bespoke</a>
+      <a onclick="toggleFullscreenMenu()" href="#journal" class="text-xs tracking-[0.18em] uppercase text-ivory hover:text-champagne">Journal</a>
+      <a onclick="toggleFullscreenMenu()" href="#concierge" class="text-xs tracking-[0.18em] uppercase text-ivory hover:text-champagne">Concierge</a>
+    </nav>
   </div>
 
   <!-- =====================================================================
        03. FULL-SCREEN CINEMATIC 3D HERO (100vh)
   ====================================================================== -->
-  <section id="hero" class="relative min-h-screen w-full flex flex-col justify-between overflow-hidden bg-obsidian pt-20">
-    <!-- Ambient Radial Spotlight -->
-    <div class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_46%,rgba(197,164,109,0.14)_0%,rgba(20,21,21,0.4)_45%,rgba(8,9,9,0.98)_82%)]"></div>
-
-    <!-- Top Architectural Telemetry Bar -->
-    <div class="relative z-10 max-w-[1440px] w-full mx-auto px-5 md:px-10 pt-4 flex items-center justify-between text-[10px] tracking-ultra text-titanium/70 uppercase">
-      <span class="flex items-center gap-2">
-        <span class="w-1.5 h-1.5 rounded-full bg-champagne animate-pulse"></span>
-        Caliber AU-01 Openworked Tourbillon
-      </span>
-      <span class="hidden md:inline">Drag 360° to Inspect Timepiece</span>
-      <span>Swiss Manufacture • 28,800 VPH</span>
-    </div>
-
-    <!-- Center Interactive 3D Hero Stage -->
-    <div class="relative flex-1 w-full flex items-center justify-center min-h-[540px] md:min-h-[620px]">
-      <div id="hero-canvas-container" class="webgl-container absolute inset-0 w-full h-full cursor-grab active:cursor-grabbing"></div>
-
-      <!-- Subtle Editorial Overlay Typography -->
-      <div class="relative z-10 pointer-events-none max-w-[1440px] w-full mx-auto px-5 md:px-10 flex flex-col lg:flex-row items-center lg:items-end justify-between h-full py-8 md:py-12 gap-8">
-        <div class="text-center lg:text-left max-w-xl bg-obsidian/45 lg:bg-transparent backdrop-blur-[2px] lg:backdrop-blur-none p-4 lg:p-0">
-          <p class="text-[10px] md:text-xs tracking-ultra text-champagne uppercase mb-3">Aurelion Flagship Collection</p>
-          <h1 class="font-serif text-4xl sm:text-6xl xl:text-7xl font-light tracking-wide text-ivory leading-[1.05]">
-            TIME IS AN <span class="italic text-champagne">ART FORM.</span>
-          </h1>
-          <p class="mt-4 text-xs sm:text-sm text-titanium leading-relaxed max-w-md mx-auto lg:mx-0 font-light">
-            Beyond precision. Beyond expectation. A new expression of mechanical excellence sculpted in 18k champagne gold and Grade 5 titanium.
-          </p>
+  <section id="hero" class="relative min-h-[760px] lg:min-h-[820px] bg-black overflow-hidden flex items-center" aria-label="Aurelion luxury watch collection">
+    <img src="https://images.unsplash.com/photo-1749831754129-3a84b9fdeb87?auto=format&fit=crop&w=2200&q=88" alt="Luxury wristwatch photographed against a dark studio background" class="absolute inset-0 w-full h-full object-cover object-center opacity-80" fetchpriority="high" onerror="this.remove()" />
+    <div class="absolute inset-0 bg-gradient-to-r from-black via-black/75 to-black/10"></div>
+    <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-black/40"></div>
+    <div class="relative z-10 w-full max-w-[1440px] mx-auto px-6 md:px-10 pt-28 pb-24 grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+      <div class="lg:col-span-5 max-w-2xl">
+        <p class="text-[10px] md:text-xs tracking-[0.32em] text-champagne uppercase mb-6">Swiss-inspired watchmaking</p>
+        <h1 class="font-serif text-6xl sm:text-7xl xl:text-8xl leading-[0.9] font-light text-ivory">TIME IS AN <span class="block italic text-champagne">ART FORM.</span></h1>
+        <p class="mt-7 text-base md:text-lg text-ivory/85 font-light max-w-md">Engineered beyond precision. Designed beyond time.</p>
+        <div class="mt-9 flex flex-wrap gap-3">
+          <a href="#collections" class="inline-flex items-center gap-4 px-7 py-4 bg-champagne text-obsidian text-xs tracking-widest uppercase font-semibold hover:bg-ivory transition-colors">Explore collection <span aria-hidden="true">→</span></a>
+          <a href="#movement-lab" class="inline-flex items-center gap-3 px-7 py-4 border border-champagne text-champagne text-xs tracking-widest uppercase hover:bg-champagne/10 transition-colors">Discover the movement <span aria-hidden="true">▷</span></a>
         </div>
-
-        <!-- Primary & Secondary Hero CTAs -->
-        <div class="pointer-events-auto flex flex-col sm:flex-row items-center gap-4">
-          <a href="#collections" class="btn-luxury px-7 py-4 bg-champagne text-obsidian text-[11px] font-semibold tracking-editorial uppercase hover:bg-ivory transition-colors text-center min-w-[220px]">
-            Explore The Collection
-          </a>
-          <a href="#movement-lab" onclick="triggerExplodeFromHero()" class="btn-luxury px-7 py-4 bg-obsidian/80 backdrop-blur-md hairline-border text-ivory text-[11px] tracking-editorial uppercase hover:border-champagne hover:text-champagne transition-colors text-center min-w-[220px]">
-            Discover The Movement
-          </a>
-        </div>
+        <p class="mt-8 text-[9px] tracking-[0.2em] uppercase text-ivory/50">Illustrative luxury-watch photography · AURELION concept collection</p>
+      </div>
+      <div class="lg:col-span-7 flex flex-col gap-4 lg:pl-8">
+        <a href="#viewer-studio" class="hero-feature-card group flex items-center justify-between gap-4 p-5 md:p-6 rounded-xl border border-champagne/40 bg-black/55 backdrop-blur-sm hover:border-champagne transition-all">
+          <div><span class="text-champagne text-xs tracking-widest uppercase">360° inspection</span><span class="block font-serif text-2xl md:text-3xl text-ivory mt-1">Explore the timepiece</span></div>
+          <img src="https://images.unsplash.com/photo-1610897534349-7759782118b9?auto=format&fit=crop&w=520&q=82" alt="Black and gold wristwatch detail" class="w-28 h-24 md:w-40 md:h-28 object-cover rounded-lg" loading="lazy" onerror="this.remove()" />
+        </a>
+        <a href="#movement-lab" class="hero-feature-card group flex items-center justify-between gap-4 p-5 md:p-6 rounded-xl border border-champagne/40 bg-black/55 backdrop-blur-sm hover:border-champagne transition-all">
+          <div><span class="text-champagne text-xs tracking-widest uppercase">Mechanical architecture</span><span class="block font-serif text-2xl md:text-3xl text-ivory mt-1">Discover the movement</span></div>
+          <img src="https://images.unsplash.com/photo-1647174317920-a9c6780f825b?auto=format&fit=crop&w=520&q=82" alt="Luxury watch on a dark display" class="w-28 h-24 md:w-40 md:h-28 object-cover rounded-lg" loading="lazy" onerror="this.remove()" />
+        </a>
+        <a href="#bespoke" class="hero-feature-card group flex items-center justify-between gap-4 p-5 md:p-6 rounded-xl border border-champagne/40 bg-black/55 backdrop-blur-sm hover:border-champagne transition-all">
+          <div><span class="text-champagne text-xs tracking-widest uppercase">Sur-mesure atelier</span><span class="block font-serif text-2xl md:text-3xl text-ivory mt-1">Customize your watch</span></div>
+          <img src="https://images.unsplash.com/photo-1579543768549-96d37c1df78f?auto=format&fit=crop&w=520&q=82" alt="Gold and black watch detail" class="w-28 h-24 md:w-40 md:h-28 object-cover rounded-lg" loading="lazy" onerror="this.remove()" />
+        </a>
       </div>
     </div>
-
-    <!-- Bottom Scroll Cue & Specs Strip -->
-    <div class="relative z-10 border-t border-ivory/10 bg-obsidian/80 backdrop-blur-md">
-      <div class="max-w-[1440px] mx-auto px-5 md:px-10 py-3.5 flex flex-wrap items-center justify-between gap-4 text-[10px] tracking-editorial text-titanium uppercase">
-        <div class="flex items-center gap-6">
-          <span>Power Reserve: <strong class="text-ivory font-medium">72 Hours</strong></span>
-          <span class="hidden sm:inline">Case: <strong class="text-ivory font-medium">41.0 mm</strong></span>
-          <span class="hidden md:inline">Water Resistance: <strong class="text-ivory font-medium">100M / 10 ATM</strong></span>
-        </div>
-        <a href="#viewer-studio" class="flex items-center gap-2 text-champagne hover:text-ivory transition-colors">
-          <span>Enter Atelier 3D Studio</span>
-          <span>&darr;</span>
-        </a>
+    <div class="absolute bottom-0 left-0 right-0 z-10 border-t border-champagne/20 bg-black/75 backdrop-blur-sm">
+      <div class="max-w-[1440px] mx-auto px-6 md:px-10 py-5 grid grid-cols-3 gap-4 text-center text-[9px] md:text-xs tracking-widest uppercase text-ivory/85">
+        <div><span class="block text-champagne text-xl mb-1">◇</span>Premium materials</div><div><span class="block text-champagne text-xl mb-1">⚙</span>Mechanical precision</div><div><span class="block text-champagne text-xl mb-1">∞</span>Timeless design</div>
       </div>
     </div>
   </section>
@@ -1095,6 +1003,11 @@
             </div>
           </div>
 
+          <div class="relative overflow-hidden border border-champagne/20 bg-black">
+            <img id="pdp-photo" src="https://images.unsplash.com/photo-1749831754129-3a84b9fdeb87?auto=format&fit=crop&w=1400&q=86" alt="Luxury wristwatch product photography reference" class="w-full h-[230px] sm:h-[300px] object-cover" loading="lazy" onerror="this.onerror=null;this.style.display='none';this.parentElement.classList.add('photo-unavailable')" />
+            <div class="absolute bottom-0 left-0 right-0 px-4 py-3 bg-gradient-to-t from-black/90 to-transparent text-[9px] tracking-widest uppercase text-ivory/80">Product photography reference · not an actual AURELION product image</div>
+          </div>
+
           <!-- Craftsmanship & Warranty Highlights -->
           <div class="grid grid-cols-3 gap-4">
             <div class="p-4 bg-charcoal hairline-subtle">
@@ -1347,6 +1260,18 @@
     /* -----------------------------------------------------------------------
        1. HOROLOGICAL DATA MODELS (8 TIMEPIECES, 15 COMPONENTS, ARTICLES)
     ----------------------------------------------------------------------- */
+    // Real stock-watch photographs used as visual references, not verified AURELION product shots.
+    const WATCH_PHOTOS = {
+      'au-noir-01': 'https://images.unsplash.com/photo-1749831754129-3a84b9fdeb87?auto=format&fit=crop&w=1000&q=86',
+      'au-noir-02': 'https://images.unsplash.com/photo-1610897534349-7759782118b9?auto=format&fit=crop&w=1000&q=86',
+      'au-royale-01': 'https://images.unsplash.com/photo-1579543768549-96d37c1df78f?auto=format&fit=crop&w=1000&q=86',
+      'au-royale-02': 'https://images.unsplash.com/photo-1647174317920-a9c6780f825b?auto=format&fit=crop&w=1000&q=86',
+      'au-chronos-01': 'https://images.unsplash.com/photo-1710671544323-8e448efa283e?auto=format&fit=crop&w=1000&q=86',
+      'au-chronos-02': 'https://images.unsplash.com/photo-1610897534349-7759782118b9?auto=format&fit=crop&w=1000&q=86',
+      'au-infinite-01': 'https://images.unsplash.com/photo-1749831754129-3a84b9fdeb87?auto=format&fit=crop&w=1000&q=86',
+      'au-infinite-02': 'https://images.unsplash.com/photo-1647174317920-a9c6780f825b?auto=format&fit=crop&w=1000&q=86'
+    };
+
     const WATCH_CATALOGUE = [
       {
         id: 'au-noir-01',
@@ -1619,8 +1544,17 @@
        2. GLOBAL STATE & CURRENCY FORMATTING
     ----------------------------------------------------------------------- */
     let displayCurrency = 'INR';
-    let bag = JSON.parse(localStorage.getItem('aurelion_bag') || '[]');
-    let wishlist = JSON.parse(localStorage.getItem('aurelion_wishlist') || '[]');
+    function loadSavedState(key, fallback) {
+      try {
+        const saved = JSON.parse(localStorage.getItem(key) || 'null');
+        return saved == null ? fallback : saved;
+      } catch (error) {
+        console.warn(`Could not read ${key}; starting with an empty state.`, error);
+        return fallback;
+      }
+    }
+    let bag = loadSavedState('aurelion_bag', []);
+    let wishlist = loadSavedState('aurelion_wishlist', []);
     let activeCollectionFilter = 'ALL';
     let currentPdpWatch = WATCH_CATALOGUE[0];
     let currentPdpStrap = { label: 'FKM Vulcanized Rubber', type: 'rubber' };
@@ -1682,7 +1616,7 @@
       return cubeTex;
     }
 
-    const SHARED_ENV_MAP = createStudioEnvMap();
+    const SHARED_ENV_MAP = window.THREE ? createStudioEnvMap() : null;
 
     const MATERIAL_PRESETS = {
       gold: { color: 0xC5A46D, metalness: 0.94, roughness: 0.22 },
@@ -2108,6 +2042,10 @@
     function createViewport(containerId, watchOptions, config = {}) {
       const container = document.getElementById(containerId);
       if (!container) return null;
+      if (!window.THREE || !window.THREE.WebGLRenderer || !window.THREE.OrbitControls) {
+        container.innerHTML = '<div class="w-full h-full min-h-[240px] flex items-center justify-center p-8 text-center"><div><p class="text-[10px] tracking-[0.22em] uppercase text-champagne mb-2">3D viewer unavailable</p><p class="text-xs text-titanium">The 3D library could not load. Product photography and specifications remain available.</p></div></div>';
+        return null;
+      }
 
       let renderer;
       try {
@@ -2195,12 +2133,9 @@
     let pdpExploded = false;
 
     function initAll3DViewports() {
-      heroVP = createViewport('hero-canvas-container', { caseType: 'gold', dialType: 'skeleton', strapType: 'rubber', handsType: 'gold' }, {
-        camPos: [0.4, 0.25, 5.1],
-        autoRotate: true,
-        autoRotateSpeed: 0.75,
-        particles: true
-      });
+      // The homepage hero is intentionally photography-led. The interactive
+      // concept model is reserved for the Movement Studio and product detail.
+      heroVP = null;
 
       studioVP = createViewport('studio-canvas-container', { caseType: 'gold', dialType: 'skeleton', strapType: 'rubber', handsType: 'gold' }, {
         camPos: [0.85, 0.35, 5.2],
@@ -2243,7 +2178,7 @@
     }
 
     // Master Animation Loop
-    const clock = new THREE.Clock();
+    const clock = window.THREE ? new THREE.Clock() : { getElapsedTime: () => performance.now() / 1000 };
     function animateMasterLoop() {
       requestAnimationFrame(animateMasterLoop);
       const elapsed = clock.getElapsedTime();
@@ -2467,9 +2402,9 @@
                 </button>
               </div>
 
-              <div onclick="openProductModal('${watch.id}')" class="cursor-pointer py-6 bg-obsidian/70 hairline-subtle mb-5 relative overflow-hidden">
-                ${renderWatchArtSVG(watch)}
-                <span class="absolute bottom-2.5 right-3 text-[9px] tracking-widest uppercase text-champagne opacity-0 group-hover:opacity-100 transition-opacity">Inspect 3D &rarr;</span>
+              <div onclick="openProductModal('${watch.id}')" class="product-photo-wrap cursor-pointer hairline-subtle mb-5">
+                <img src="${WATCH_PHOTOS[watch.id]}" alt="Luxury wristwatch photography reference for ${watch.name}" class="product-photo" loading="lazy" onerror="this.onerror=null;this.remove();this.parentElement.classList.add('photo-unavailable')" />
+                <span class="absolute bottom-0 left-0 right-0 px-3 py-3 text-[9px] tracking-widest uppercase text-ivory bg-gradient-to-t from-black/90 to-transparent">View details &amp; 3D inspection →</span>
               </div>
 
               <p class="text-[10px] font-mono text-titanium/70">${watch.ref}</p>
@@ -2499,6 +2434,8 @@
       currentPdpStrap = { label: watch.strapLabel, type: watch.strapType };
       pdpExploded = false;
 
+      document.getElementById('pdp-photo').src = WATCH_PHOTOS[watch.id] || WATCH_PHOTOS['au-noir-01'];
+      document.getElementById('pdp-photo').alt = `Luxury watch photography reference for ${watch.name}`;
       document.getElementById('pdp-collection-tag').textContent = watch.collection;
       document.getElementById('pdp-ref-tag').textContent = `REF. ${watch.ref}`;
       document.getElementById('pdp-availability').textContent = watch.availability;
@@ -2957,13 +2894,18 @@
       const totalItems = bag.reduce((sum, i) => sum + i.qty, 0);
       const subtotalINR = bag.reduce((sum, i) => sum + i.priceINR * i.qty, 0);
 
-      document.getElementById('bag-badge').textContent = totalItems;
-      document.getElementById('drawer-bag-count').textContent = totalItems;
+      const bagBadge = document.getElementById('bag-badge');
+      if (bagBadge) bagBadge.textContent = totalItems;
+      const drawerBagCount = document.getElementById('drawer-bag-count');
+      if (drawerBagCount) drawerBagCount.textContent = totalItems;
 
       const wishBadge = document.getElementById('wishlist-badge');
-      wishBadge.textContent = wishlist.length;
-      wishBadge.classList.toggle('hidden', wishlist.length === 0);
-      document.getElementById('drawer-wish-count').textContent = wishlist.length;
+      if (wishBadge) {
+        wishBadge.textContent = wishlist.length;
+        wishBadge.classList.toggle('hidden', wishlist.length === 0);
+      }
+      const drawerWishCount = document.getElementById('drawer-wish-count');
+      if (drawerWishCount) drawerWishCount.textContent = wishlist.length;
 
       const bagContainer = document.getElementById('bag-items-container');
       const bagFooter = document.getElementById('bag-summary-footer');
@@ -3070,15 +3012,12 @@
        11. NAVIGATION, PRELOADER & TOAST SYSTEM
     ----------------------------------------------------------------------- */
     function toggleFullscreenMenu() {
-      const menu = document.getElementById('fullscreen-menu');
-      const isHidden = menu.classList.contains('hidden');
-      if (isHidden) {
-        menu.classList.remove('hidden');
-        requestAnimationFrame(() => menu.classList.remove('opacity-0'));
-      } else {
-        menu.classList.add('opacity-0');
-        setTimeout(() => menu.classList.add('hidden'), 450);
-      }
+      const menu = document.getElementById('mobile-nav-panel');
+      const toggle = document.getElementById('mobile-nav-toggle');
+      if (!menu) return;
+      const isOpen = !menu.classList.contains('hidden');
+      menu.classList.toggle('hidden', isOpen);
+      if (toggle) toggle.setAttribute('aria-expanded', String(!isOpen));
     }
 
     function showToast(message) {
